@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: blog-server
+    name: blog-gateway
   cloud:
     gateway:
       discovery:
@@ -11,8 +11,8 @@ spring:
           enabled: false
           lowerCaseServiceId: true
       routes:
-      - id: blog-user
-        uri: lb://BLOG-USER
+      - id: blog-feign
+        uri: lb://BLOG-FEIGN
         predicates:
           - Path=/blog/**
         filters:

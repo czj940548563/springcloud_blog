@@ -19,6 +19,9 @@
 
     <modules>
         <module>../blog-eureka</module>
+        <module>../blog-auth</module>
+        <module>../blog-gateway</module>
+        <module>../blog-feign</module>
     </modules>
 
     <properties>
