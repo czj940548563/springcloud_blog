@@ -18,6 +18,35 @@ spring:
         filters:
           - StripPrefix=1
           - RequestTime=true
+          #熔断降级配置
+          - name: Hystrix
+            args:
+              name : default
+              fallbackUri: 'forward:/defaultfallback'
+          # redis限流 ， filter名称必须是RequestRateLimiter
+          - name: RequestRateLimiter
+            args:
+              # 使用SpEL名称引用Bean，与上面新建的RateLimiterConfig类中的bean的name相同
+              key-resolver: '#{@remoteAddrKeyResolver}'
+              # 每秒最大访问次数
+              redis-rate-limiter.replenishRate: 20
+              # 令牌桶最大容量
+              redis-rate-limiter.burstCapacity: 20
+  redis:
+    database: 0
+    host: 127.0.0.1
+    port: 6379
+# hystrix 信号量隔离，5秒后自动超时
+hystrix:
+ command:
+   default:
+     execution:
+       isolation:
+         strategy: SEMAPHORE
+         thread:
+           timeoutInMilliseconds: 5000
+ shareSecurityContext: true
+
 
 eureka:
   client:

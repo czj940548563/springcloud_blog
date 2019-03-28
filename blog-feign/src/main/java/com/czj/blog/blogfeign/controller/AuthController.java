@@ -29,4 +29,19 @@ public class AuthController {
         List<User> users = schedualBlogAuth.selectAllUser();
         return Result.success(users);
     }
+
+    /**
+     * 超时熔断测试
+     * @return
+     */
+    @RequestMapping("/timeout")
+    public String timeout(){
+        try{
+            //睡6秒，网关Hystrix5秒超时，会触发熔断降级操作
+            Thread.sleep(6000);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return "timeout";
+    }
 }
