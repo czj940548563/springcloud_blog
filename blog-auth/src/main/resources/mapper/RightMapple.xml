@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.czj.blog.blogauth.dao.RightDao">
+
+
+    <resultMap id="BaseResultMap" type="com.czj.blog.blogauth.domain.Right">
+        <result column="id" property="id" />
+        <result column="right_name" property="rightName" />
+        <result column="description" property="description" />
+    </resultMap>
+
+    <parameterMap id="Right" type="com.czj.blog.blogauth.domain.Right"/>
+
+    <sql id="Base_Column_List">
+		id, right_name, description
+	</sql>
+
+    <select id="selectRightById" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List" />
+        from t_right
+        where id = #{id}
+    </select>
+
+    <update id="updateRight" parameterType="com.czj.blog.blogauth.domain.Right">
+        update t_user
+        <set>
+            <if test="right_name != null">role_name=#{rightName},</if>
+            <if test="description != null">description=#{description},</if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <insert id="insertRight" parameterType="com.czj.blog.blogauth.domain.Right">
+        insert into t_right(id, right_name, description)
+        values(#{id}, #{rightName}, #{description})
+    </insert>
+    <delete id="deleteRole" parameterType="java.lang.Long">
+        delete from t_right where id=#{id}
+    </delete>
+
+    <delete id="deleteRoles"  parameterType = "java.util.List">
+        delete from t_right where 1>2
+            or id in
+        <foreach collection="ids"  item="item" open="(" separator="," close=")"  >
+                 #{item}
+        </foreach>
+    </delete>
+
+
+</mapper>
