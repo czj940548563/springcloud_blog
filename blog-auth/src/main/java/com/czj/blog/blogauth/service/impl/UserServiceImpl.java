@@ -37,10 +37,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String insertUser(User user) {
+    public Integer insertUser(User user) {
 
-        if (userDao.insertUser(user)>0) return "success";
-        else return "error";
+        return userDao.insertUser(user);
     }
 
     @Override

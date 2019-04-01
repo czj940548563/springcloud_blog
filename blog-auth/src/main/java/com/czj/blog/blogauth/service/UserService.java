@@ -13,7 +13,7 @@ import java.util.List;
 public interface UserService {
     public User selectUser(User user);
     public List<User> selectAllUser();
-    public String insertUser(User user);
+    public Integer insertUser(User user);
     public Integer updateUser(User user);
     public Integer updateLoginTime(User user);
     public Integer deleteUser(Long id);

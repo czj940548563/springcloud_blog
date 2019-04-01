@@ -1,13 +1,11 @@
 package com.czj.blog.blogfeign.controller;
 
 import com.czj.blog.blogauth.domain.User;
+import com.czj.blog.blogfeign.result.CodeMsg;
 import com.czj.blog.blogfeign.result.Result;
 import com.czj.blog.blogfeign.service.SchedualBlogAuth;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,6 +26,12 @@ public class AuthController {
     public Result<List> selectAllUser(){
         List<User> users = schedualBlogAuth.selectAllUser();
         return Result.success(users);
+    }
+    @PostMapping(value = "/regist")
+    public Result<Object> regist(User user) {
+        Integer integer = schedualBlogAuth.insertUser(user);
+        if (integer>0) return Result.success(user);
+        else return  Result.error(CodeMsg.SERVER_ERROR);
     }
 
     /**

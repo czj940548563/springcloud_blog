@@ -2,12 +2,10 @@ package com.czj.blog.blogauth.controller;
 
 import com.czj.blog.blogauth.domain.User;
 import com.czj.blog.blogauth.service.UserService;
+import com.czj.blog.blogauth.utils.SnowflakeIdWorker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,6 +28,11 @@ public class AuthController {
     @RequestMapping(value = "/selectAllUser",method = RequestMethod.GET)
     public List<User> selectAllUser() {
         return userService.selectAllUser();
-
+    }
+    @PostMapping(value = "/regist")
+    public Integer regist(User user) {
+        Long id = SnowflakeIdWorker.generateId();
+        user.setId(id);
+        return userService.insertUser(user);
     }
 }
