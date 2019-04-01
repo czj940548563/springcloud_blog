@@ -8,7 +8,7 @@
         <result column="mobile" property="mobile"/>
         <result column="mail" property="mail"/>
         <result column="login_time" property="loginTime"/>
-        <result column="count" property="loginCount"/>
+        <result column="login_count" property="loginCount"/>
         <result column="last_login_time" property="lastLoginTime"/>
         <collection property="roles" ofType="Role" select="getRoles" javaType="ArrayList" column="id">
         </collection>
@@ -18,7 +18,7 @@
     <parameterMap id="User" type="com.czj.blog.blogauth.domain.User"/>
 
     <sql id="Base_Column_List">
-		id, account, password, mobile ,mail,login_time,last_login_time
+		id, account, password, mobile ,mail,login_time,last_login_time,login_count
 	</sql>
 
     <select id="selectUser" resultMap="BaseResultMap" parameterType="com.czj.blog.blogauth.domain.User">
@@ -41,7 +41,7 @@
     </select>
 
 
-    <select id="getRoles" parameterType="int" resultType="com.czj.blog.blogauth.domain.Role">
+    <select id="getRoles" parameterType="java.lang.Long" resultType="com.czj.blog.blogauth.domain.Role">
 		select r.id as id,
 			r.role_name as roleName,
 			r.description as description
@@ -56,32 +56,35 @@
             <if test="password != null">password=#{password},</if>
             <if test="mobile != null">mobile=#{mobile},</if>
             <if test="mail != null">mail=#{mail},</if>
-        </set>
-        where id=#{id}
-    </update>
-    <update id="updateLoginTime" parameterType="com.czj.blog.blogauth.domain.User">
-        update t_user
-        <set>
             <if test="loginTime != null">login_time=#{loginTime},</if>
             <if test="lastLoginTime != null">last_login_time=#{lastLoginTime},</if>
+            <if test="loginCount != null">login_count=#{loginCount},</if>
         </set>
         where id=#{id}
     </update>
+
     <insert id="insertUser"  parameterType="com.czj.blog.blogauth.domain.User">
-        insert into t_user( account, password, mobile, mail,login_count)
-        values( #{account}, #{password}, #{mobile}, #{mail},#{count})
+        insert into t_user(id,account, password, mobile, mail,login_count)
+        values(#{id}, #{account}, #{password}, #{mobile}, #{mail},#{loginCount})
     </insert>
-    <delete id="deleteUser" parameterType="java.lang.Long">
-        delete from t_user where id=#{id}
-    </delete>
+
 
     <delete id="deleteUsers" parameterType="java.util.List">
-        delete from t_user where 1>2
-            or id in
-        <foreach collection="ids" item="item" open="(" separator="," close=")">
-                 #{item}
+        delete from t_user where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")" index="index">
+            #{id}
         </foreach>
     </delete>
 
+    <select id="selectUserByAccount" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from t_user where account=#{account}
+    </select>
+
+    <delete id="deleteUserRoleById" parameterType="java.util.List">
+        delete from t_user_role where user_id in
+        <foreach collection="list" item="id" open="(" separator="," close=")" index="index">
+            #{id}
+        </foreach>
+    </delete>
 
 </mapper>

@@ -1,5 +1,8 @@
 package com.czj.blog.blogauth.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.context.annotation.Lazy;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -8,6 +11,7 @@ import java.util.List;
  * @Author: clownc
  * @Date: 2019-01-28 17:05
  */
+@JsonIgnoreProperties(value = {"handler"})
 public class Role implements Serializable {
 
     private static final long serialVersionUID = 7749966648800321871L;

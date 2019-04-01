@@ -1,13 +1,12 @@
 package com.czj.blog.blogauth.service.impl;
 
 
-
+import com.czj.blog.blogauth.dao.RoleDao;
 import com.czj.blog.blogauth.dao.UserDao;
 import com.czj.blog.blogauth.domain.User;
 import com.czj.blog.blogauth.service.UserService;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -22,6 +21,7 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserDao userDao;
+
 
     @Override
     public User selectUser(User user) {
@@ -44,21 +44,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Integer updateUser(User user) {
-        return null;
+        return userDao.updateUser(user);
     }
 
     @Override
-    public Integer updateLoginTime(User user) {
-        return null;
+    public Integer deleteUsers( List<Long> ids) {
+        Integer integer = userDao.deleteUsers(ids);
+        Integer integer1 = userDao.deleteUserRoleById(ids);
+        return integer;
     }
 
     @Override
-    public Integer deleteUser(Long id) {
-        return null;
-    }
-
-    @Override
-    public Integer deleteUsers(List<Long> ids) {
-        return null;
+    public User selectUserByAccount(String account) {
+        return userDao.selectUserByAccount(account);
     }
 }

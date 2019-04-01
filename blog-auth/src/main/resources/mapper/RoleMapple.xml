@@ -15,15 +15,15 @@
 		id, role_name, description
 	</sql>
 
-    <select id="selectRoleById" resultMap="BaseResultMap" parameterType="java.lang.Long">
+    <select id="selectRoleByName" resultMap="BaseResultMap" parameterType="java.lang.String">
         select
         <include refid="Base_Column_List" />
         from t_role
-        where id = #{id}
+        where role_name = #{roleName}
     </select>
 
 
-    <select id="getRights" parameterType="int" resultType="com.czj.blog.blogauth.domain.Right">
+    <select id="getRights" parameterType="java.lang.Long" resultType="com.czj.blog.blogauth.domain.Right">
 	select
 			r.id as id,
 			r.right_name as rightName,
@@ -34,9 +34,9 @@
 
 
     <update id="updateRole" parameterType="com.czj.blog.blogauth.domain.Role">
-        update t_user
+        update t_role
         <set>
-            <if test="role_name != null">role_name=#{roleName},</if>
+            <if test="roleName != null">role_name=#{roleName},</if>
             <if test="description != null">description=#{description},</if>
         </set>
         where id=#{id}
@@ -46,15 +46,12 @@
         insert into t_role(id, role_name, description)
         values(#{id}, #{roleName}, #{description})
     </insert>
-    <delete id="deleteRole" parameterType="java.lang.Long">
-        delete from t_role where id=#{id}
-    </delete>
 
     <delete id="deleteRoles"  parameterType = "java.util.List">
         delete from t_role where 1>2
             or id in
-        <foreach collection="ids"  item="item" open="(" separator="," close=")"  >
-                 #{item}
+        <foreach collection="list"  item="item" open="(" separator="," close=")"  >
+            #{item}
         </foreach>
     </delete>
 

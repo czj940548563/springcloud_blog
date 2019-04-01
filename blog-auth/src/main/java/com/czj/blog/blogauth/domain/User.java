@@ -1,5 +1,7 @@
 package com.czj.blog.blogauth.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -8,6 +10,8 @@ import java.util.List;
  * @Author: clownc
  * @Date: 2019-01-28 17:05
  */
+
+@JsonIgnoreProperties(value = {"handler"})
 public class User implements Serializable {
     private static final long serialVersionUID = -3838384310005532619L;
     private Long id;
@@ -22,13 +26,6 @@ public class User implements Serializable {
     private Date modifyTime;
     private List<Role> roles;
 
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
 
     public Long getId() {
         return id;
@@ -68,6 +65,14 @@ public class User implements Serializable {
 
     public void setMail(String mail) {
         this.mail = mail;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     public Date getLoginTime() {

@@ -15,11 +15,12 @@ public interface UserDao {
 
     Integer updateUser(User user);
 
-    Integer updateLoginTime(User user);
-
-    Integer deleteUser(Long id);
 
     Integer deleteUsers(List<Long> ids);
 
     List<User> selectAllUser();
+
+    User selectUserByAccount(String account);
+
+    Integer deleteUserRoleById(List<Long> ids);
 }
