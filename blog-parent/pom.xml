@@ -36,6 +36,7 @@
         <mysql.connecotor.version>8.0.12</mysql.connecotor.version>
         <pagehelper.version>1.2.10</pagehelper.version>
         <common-lang3.version>3.8.1</common-lang3.version>
+        <fast-json.version>1.2.56</fast-json.version>
     </properties>
 
     <dependencies>
@@ -87,7 +88,14 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
-        
+        <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fast-json.version}</version>
+        </dependency>
+
+
     </dependencies>
 
     <dependencyManagement>

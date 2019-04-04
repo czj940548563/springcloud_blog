@@ -1,7 +1,9 @@
 package com.czj.blog.blogauth.domain;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -18,8 +20,8 @@ public class Right implements Serializable {
     private Long id;
     private String rightName;
     private String description;
-    private Date creatTime;
-    private Date modifyTime;
+    private String creatTime;
+    private String updateTime;
 
     public Long getId() {
         return id;
@@ -45,19 +47,19 @@ public class Right implements Serializable {
         this.description = description;
     }
 
-    public Date getCreatTime() {
+    public String getCreatTime() {
         return creatTime;
     }
 
-    public void setCreatTime(Date creatTime) {
+    public void setCreatTime(String creatTime) {
         this.creatTime = creatTime;
     }
 
-    public Date getModifyTime() {
-        return modifyTime;
+    public String getUpdateTime() {
+        return updateTime;
     }
 
-    public void setModifyTime(Date modifyTime) {
-        this.modifyTime = modifyTime;
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
     }
 }

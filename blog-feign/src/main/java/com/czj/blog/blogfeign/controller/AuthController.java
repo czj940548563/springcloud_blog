@@ -111,6 +111,12 @@ public class AuthController {
         if (integer > 0 && ids.size() == integer) return Result.success(null);
         else return Result.error(CodeMsg.SERVER_ERROR);
     }
+    @PostMapping(value = "/deleteRoleByUser")
+    public Result<Object> deleteRoleByUser(@RequestParam(value = "userId",required=false)String userId ,@RequestParam(value = "roleId",required=false) String roleId){
+        Integer integer = schedualBlogAuth.deleteRoleByUser(Long.parseLong(userId),Long.parseLong(roleId));
+        if (integer > 0 ) return Result.success(null);
+        else return Result.error(CodeMsg.SERVER_ERROR);
+    }
 
     /**
      * 超时熔断测试

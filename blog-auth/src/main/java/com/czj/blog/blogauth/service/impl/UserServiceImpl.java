@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: clownc
@@ -57,5 +59,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public User selectUserByAccount(String account) {
         return userDao.selectUserByAccount(account);
+    }
+
+    @Override
+    public Integer deleteUserRoleByDoubleId(Long userId,Long roleId) {
+        Map<String, Object> hashMap = new HashMap<>();
+        hashMap.put("userId",userId);
+        hashMap.put("roleId",roleId);
+        Integer integer = userDao.deleteUserRoleByDoubleId(hashMap);
+        return integer;
     }
 }

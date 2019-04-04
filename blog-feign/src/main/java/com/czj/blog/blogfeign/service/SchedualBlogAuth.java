@@ -48,4 +48,7 @@ public interface SchedualBlogAuth {
 
     @PostMapping(value = "/deleteRoles")
     Integer deleteRoles(@RequestParam(value = "ids") List<Long> ids);
+
+    @PostMapping(value = "/deleteRoleByUser")
+    Integer deleteRoleByUser(@RequestParam(value = "userId")Long userId,@RequestParam(value = "roleId")Long roleId);
 }

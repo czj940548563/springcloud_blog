@@ -77,4 +77,8 @@ public class AuthController {
     public Integer deleteRoles(@RequestParam List<Long> ids){
         return roleService.deleteRoles(ids);
     }
+    @PostMapping(value = "/deleteRoleByUser")
+    public Integer deleteRoleByUser(@RequestParam Long userId,@RequestParam Long roleId){
+        return userService.deleteUserRoleByDoubleId(userId,roleId);
+    }
 }

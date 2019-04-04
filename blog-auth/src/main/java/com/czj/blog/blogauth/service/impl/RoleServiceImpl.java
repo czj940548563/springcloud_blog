@@ -34,6 +34,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Integer deleteRoles(List<Long> ids) {
+        Integer integer1 = roleDao.deleteUserRoleById(ids);
         return roleDao.deleteRoles(ids);
     }
 }

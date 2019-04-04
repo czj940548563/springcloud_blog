@@ -5,6 +5,7 @@
         <result column="id" property="id" />
         <result column="role_name" property="roleName" />
         <result column="description" property="description" />
+        <result column="createTime" property="create_time" />
         <collection property="rights" ofType="Right" select="getRights" javaType="ArrayList" column="id">
         </collection>
     </resultMap>
@@ -12,7 +13,7 @@
     <parameterMap id="Role" type="com.czj.blog.blogauth.domain.Role"/>
 
     <sql id="Base_Column_List">
-		id, role_name, description
+		id, role_name, description,create_time
 	</sql>
 
     <select id="selectRoleByName" resultMap="BaseResultMap" parameterType="java.lang.String">
@@ -27,7 +28,8 @@
 	select
 			r.id as id,
 			r.right_name as rightName,
-			r.description as description
+			r.description as description,
+			r.create_time as createTime
 		from t_right r,t_role_right rr
 		where rr.role_id= #{id} and rr.role_id=r.id
 	</select>
@@ -52,6 +54,12 @@
             or id in
         <foreach collection="list"  item="item" open="(" separator="," close=")"  >
             #{item}
+        </foreach>
+    </delete>
+    <delete id="deleteUserRoleById" parameterType="java.util.List">
+        delete from t_user_role where role_id in
+        <foreach collection="list" item="id" open="(" separator="," close=")" index="index">
+            #{id}
         </foreach>
     </delete>
 

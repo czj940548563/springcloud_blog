@@ -10,6 +10,8 @@
         <result column="login_time" property="loginTime"/>
         <result column="login_count" property="loginCount"/>
         <result column="last_login_time" property="lastLoginTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
         <collection property="roles" ofType="Role" select="getRoles" javaType="ArrayList" column="id">
         </collection>
 
@@ -18,7 +20,7 @@
     <parameterMap id="User" type="com.czj.blog.blogauth.domain.User"/>
 
     <sql id="Base_Column_List">
-		id, account, password, mobile ,mail,login_time,last_login_time,login_count
+		id, account, password, mobile,mail,login_time,last_login_time,login_count,create_time,update_time
 	</sql>
 
     <select id="selectUser" resultMap="BaseResultMap" parameterType="com.czj.blog.blogauth.domain.User">
@@ -44,7 +46,8 @@
     <select id="getRoles" parameterType="java.lang.Long" resultType="com.czj.blog.blogauth.domain.Role">
 		select r.id as id,
 			r.role_name as roleName,
-			r.description as description
+			r.description as description,
+			r.create_time as createTime
 		from t_role r,t_user_role ur
 		where ur.user_id= #{id} and ur.role_id=r.id
 	</select>
@@ -64,8 +67,9 @@
     </update>
 
     <insert id="insertUser"  parameterType="com.czj.blog.blogauth.domain.User">
-        insert into t_user(id,account, password, mobile, mail,login_count)
-        values(#{id}, #{account}, #{password}, #{mobile}, #{mail},#{loginCount})
+        insert into t_user(id,account, password, mobile, mail,login_count,login_time,last_login_time)
+        values(#{id}, #{account}, #{password}, #{mobile}, #{mail},#{loginCount},#{loginTime},#{lastLoginTime})
+
     </insert>
 
 
@@ -85,6 +89,9 @@
         <foreach collection="list" item="id" open="(" separator="," close=")" index="index">
             #{id}
         </foreach>
+    </delete>
+    <delete id="deleteUserRoleByDoubleId" parameterType="java.util.Map" >
+        delete from t_user_role where user_id=#{userId} and role_id=#{roleId}
     </delete>
 
 </mapper>

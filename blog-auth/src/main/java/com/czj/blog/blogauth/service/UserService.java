@@ -5,6 +5,7 @@ package com.czj.blog.blogauth.service;
 import com.czj.blog.blogauth.domain.User;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: clownc
@@ -17,4 +18,5 @@ public interface UserService {
     public Integer updateUser(User user);
     public Integer deleteUsers(List<Long> ids);
     public User selectUserByAccount(String account);
+    public Integer deleteUserRoleByDoubleId(Long userId,Long roleId );
 }

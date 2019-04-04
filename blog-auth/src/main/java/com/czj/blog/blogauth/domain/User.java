@@ -1,6 +1,9 @@
 package com.czj.blog.blogauth.domain;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -19,13 +22,12 @@ public class User implements Serializable {
     private String password;
     private String mobile;
     private String mail;
-    private Date createTime;
-    private Date loginTime;
-    private Date lastLoginTime;
+    private String createTime;
+    private String loginTime;
+    private String lastLoginTime;
     private Integer loginCount;
-    private Date modifyTime;
+    private String updateTime;
     private List<Role> roles;
-
 
     public Long getId() {
         return id;
@@ -67,27 +69,27 @@ public class User implements Serializable {
         this.mail = mail;
     }
 
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
-    public Date getLoginTime() {
+    public String getLoginTime() {
         return loginTime;
     }
 
-    public void setLoginTime(Date loginTime) {
+    public void setLoginTime(String loginTime) {
         this.loginTime = loginTime;
     }
 
-    public Date getLastLoginTime() {
+    public String getLastLoginTime() {
         return lastLoginTime;
     }
 
-    public void setLastLoginTime(Date lastLoginTime) {
+    public void setLastLoginTime(String lastLoginTime) {
         this.lastLoginTime = lastLoginTime;
     }
 
@@ -99,12 +101,12 @@ public class User implements Serializable {
         this.loginCount = loginCount;
     }
 
-    public Date getModifyTime() {
-        return modifyTime;
+    public String getUpdateTime() {
+        return updateTime;
     }
 
-    public void setModifyTime(Date modifyTime) {
-        this.modifyTime = modifyTime;
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
     }
 
     public List<Role> getRoles() {

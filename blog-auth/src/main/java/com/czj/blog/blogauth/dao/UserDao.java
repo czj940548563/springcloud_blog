@@ -3,6 +3,7 @@ package com.czj.blog.blogauth.dao;
 import com.czj.blog.blogauth.domain.User;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: clownc
@@ -23,4 +24,6 @@ public interface UserDao {
     User selectUserByAccount(String account);
 
     Integer deleteUserRoleById(List<Long> ids);
+
+    Integer deleteUserRoleByDoubleId(Map<String, Object> params);
 }
