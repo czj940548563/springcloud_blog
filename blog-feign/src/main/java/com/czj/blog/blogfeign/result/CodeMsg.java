@@ -17,6 +17,7 @@ public class CodeMsg {
     public static CodeMsg ROLE_EXITS= new CodeMsg(500106, "角色已存在！");
     //登录模块 5002XX
     public static CodeMsg SESSION_ERROR = new CodeMsg(500210, "Session不存在或者已经失效");
+    public static CodeMsg ACCOUNT_NOTEXITS = new CodeMsg(500211, "用户不存在");
 
     private CodeMsg() {
     }

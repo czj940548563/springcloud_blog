@@ -3,6 +3,7 @@ package com.czj.blog.blogauth.service;
 
 
 import com.czj.blog.blogauth.domain.User;
+import com.github.pagehelper.PageInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -13,10 +14,10 @@ import java.util.Map;
  */
 public interface UserService {
     public User selectUser(User user);
-    public List<User> selectAllUser();
+    public PageInfo selectAllUser(int pageNum,int pageSize);
     public Integer insertUser(User user);
     public Integer updateUser(User user);
-    public Integer deleteUsers(List<Long> ids);
+    public Integer deleteUsers(List<String> ids);
     public User selectUserByAccount(String account);
-    public Integer deleteUserRoleByDoubleId(Long userId,Long roleId );
+    public Integer deleteUserRoleByDoubleId(String userId,String roleId );
 }

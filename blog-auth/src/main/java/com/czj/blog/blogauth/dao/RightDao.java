@@ -15,9 +15,9 @@ import java.util.List;
  */
 
 public interface RightDao {
-    public Right selectRIghtById(Long id);
+    public Right selectRIghtById(String id);
     public Integer insertRIght(Right right);
     public Integer updateRIght(Right right);
-    public Integer deleteRIght(Long id);
-    public Integer deleteRIghts(List<Long> ids);
+    public Integer deleteRIght(String id);
+    public Integer deleteRIghts(List<String> ids);
 }

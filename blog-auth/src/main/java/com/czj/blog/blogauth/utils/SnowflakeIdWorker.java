@@ -84,7 +84,7 @@ public class SnowflakeIdWorker {
      * 获得下一个ID (该方法是线程安全的)
      * @return SnowflakeId
      */
-    public synchronized long nextId() {
+    public synchronized Long nextId() {
         long timestamp = timeGen();
 
         //如果当前时间小于上一次ID生成的时间戳，说明系统时钟回退过这个时候应当抛出异常
@@ -168,8 +168,8 @@ public class SnowflakeIdWorker {
      *
      * @return
      */
-    public static Long generateId(){
-        long id = idWorker.nextId();
+    public static String generateId(){
+        String id = idWorker.nextId().toString();
         return id;
     }
 
@@ -179,7 +179,7 @@ public class SnowflakeIdWorker {
         System.out.println(System.currentTimeMillis());
         long startTime = System.nanoTime();
         for (int i = 0; i < 50000; i++) {
-            long id = SnowflakeIdWorker.generateId();
+            String id = SnowflakeIdWorker.generateId();
             System.out.println(id);
         }
         System.out.println((System.nanoTime()-startTime)/1000000+"ms");

@@ -45,3 +45,8 @@ mybatis:
   #configuration:
     #aggressive-lazy-loading: false
     #lazy-loading-enabled: true
+pagehelper:
+    helperDialect: mysql
+    reasonable: true
+    supportMethodsArguments: true
+    params: count=countSql

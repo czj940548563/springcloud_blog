@@ -39,11 +39,10 @@
         select
         <include refid="Base_Column_List"/>
         from t_user
-
     </select>
 
 
-    <select id="getRoles" parameterType="java.lang.Long" resultType="com.czj.blog.blogauth.domain.Role">
+    <select id="getRoles" parameterType="java.lang.String" resultType="com.czj.blog.blogauth.domain.Role">
 		select r.id as id,
 			r.role_name as roleName,
 			r.description as description,

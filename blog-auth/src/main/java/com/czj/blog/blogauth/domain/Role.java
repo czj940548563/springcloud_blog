@@ -17,18 +17,18 @@ import java.util.List;
 public class Role implements Serializable {
 
     private static final long serialVersionUID = 7749966648800321871L;
-    private Long id;
+    private String id;
     private String roleName;
     private String description;
     private String createTime;
     private String updateTime;
     private List<Right> rights;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

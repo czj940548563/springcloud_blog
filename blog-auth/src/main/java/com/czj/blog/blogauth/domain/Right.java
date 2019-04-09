@@ -17,17 +17,17 @@ import java.util.Date;
 public class Right implements Serializable {
 
     private static final long serialVersionUID = -4601859381069240541L;
-    private Long id;
+    private String id;
     private String rightName;
     private String description;
     private String creatTime;
     private String updateTime;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

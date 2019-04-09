@@ -5,6 +5,7 @@ import com.czj.blog.blogauth.domain.User;
 import com.czj.blog.blogauth.service.RoleService;
 import com.czj.blog.blogauth.service.UserService;
 import com.czj.blog.blogauth.utils.SnowflakeIdWorker;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -31,21 +32,21 @@ public class AuthController {
     }
 
     @RequestMapping(value = "/selectAllUser", method = RequestMethod.GET)
-    public List<User> selectAllUser() {
-        return userService.selectAllUser();
+    public PageInfo selectAllUser(@RequestParam int pageNum, @RequestParam int pageSize) {
+        return userService.selectAllUser(pageNum,pageSize);
     }
 
     @PostMapping(value = "/regist")
-    public Long regist(@RequestBody User user) {
-        Long id = SnowflakeIdWorker.generateId();
+    public String regist(@RequestBody User user) {
+        String id = SnowflakeIdWorker.generateId();
         user.setId(id);
         user.setLoginCount(0);
         if (userService.insertUser(user) > 0) return id;
-        else return 0L;
+        else return "0";
     }
 
     @PostMapping(value = "/deleteUsers")
-    public Integer deleteUsers(@RequestParam List<Long> ids) {
+    public Integer deleteUsers(@RequestParam List<String> ids) {
         return userService.deleteUsers(ids);
     }
 
@@ -63,22 +64,26 @@ public class AuthController {
         return roleService.selectRoleByName(name);
     }
     @PostMapping(value = "/insertRole")
-    public Long insertRole(@RequestBody Role role){
-        Long id = SnowflakeIdWorker.generateId();
+    public String insertRole(@RequestBody Role role){
+        String id = SnowflakeIdWorker.generateId();
         role.setId(id);
         if (roleService.insertRole(role) > 0) return id;
-        else return 0L;
+        else return "0";
     }
     @PostMapping(value = "/updateRole")
     public Integer updateRole(@RequestBody Role role){
         return roleService.updateRole(role);
     }
     @PostMapping(value = "/deleteRoles")
-    public Integer deleteRoles(@RequestParam List<Long> ids){
+    public Integer deleteRoles(@RequestParam List<String> ids){
         return roleService.deleteRoles(ids);
     }
     @PostMapping(value = "/deleteRoleByUser")
-    public Integer deleteRoleByUser(@RequestParam Long userId,@RequestParam Long roleId){
+    public Integer deleteRoleByUser(@RequestParam String userId,@RequestParam String roleId){
         return userService.deleteUserRoleByDoubleId(userId,roleId);
+    }
+    @RequestMapping(value = "/selectAllRole", method = RequestMethod.GET)
+    public PageInfo selectAllRole(@RequestParam int pageNum, @RequestParam int pageSize) {
+        return roleService.selectAllRole(pageNum,pageSize);
     }
 }

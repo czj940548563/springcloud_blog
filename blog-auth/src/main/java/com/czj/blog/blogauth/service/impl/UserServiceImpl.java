@@ -5,6 +5,8 @@ import com.czj.blog.blogauth.dao.RoleDao;
 import com.czj.blog.blogauth.dao.UserDao;
 import com.czj.blog.blogauth.domain.User;
 import com.czj.blog.blogauth.service.UserService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,11 +33,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> selectAllUser() {
-        if (CollectionUtils.isEmpty(userDao.selectAllUser())){
-            return Lists.newArrayList();
+    public PageInfo selectAllUser(int pageNum,int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        List<User> userList = userDao.selectAllUser();
+        if (CollectionUtils.isEmpty(userList)){
+            PageInfo<User> pageInfo = new PageInfo<>(Lists.newArrayList());
+            return pageInfo;
+        }else{
+            PageInfo<User> pageInfo = new PageInfo<>(userList);
+            return  pageInfo;
         }
-        return userDao.selectAllUser();
+
     }
 
     @Override
@@ -50,7 +58,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Integer deleteUsers( List<Long> ids) {
+    public Integer deleteUsers( List<String> ids) {
         Integer integer = userDao.deleteUsers(ids);
         Integer integer1 = userDao.deleteUserRoleById(ids);
         return integer;
@@ -62,7 +70,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Integer deleteUserRoleByDoubleId(Long userId,Long roleId) {
+    public Integer deleteUserRoleByDoubleId(String userId,String roleId) {
         Map<String, Object> hashMap = new HashMap<>();
         hashMap.put("userId",userId);
         hashMap.put("roleId",roleId);

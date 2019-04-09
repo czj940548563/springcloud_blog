@@ -17,13 +17,13 @@ public interface UserDao {
     Integer updateUser(User user);
 
 
-    Integer deleteUsers(List<Long> ids);
+    Integer deleteUsers(List<String> ids);
 
     List<User> selectAllUser();
 
     User selectUserByAccount(String account);
 
-    Integer deleteUserRoleById(List<Long> ids);
+    Integer deleteUserRoleById(List<String> ids);
 
     Integer deleteUserRoleByDoubleId(Map<String, Object> params);
 }

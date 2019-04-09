@@ -17,7 +17,7 @@ import java.util.List;
 @JsonIgnoreProperties(value = {"handler"})
 public class User implements Serializable {
     private static final long serialVersionUID = -3838384310005532619L;
-    private Long id;
+    private String id;
     private String account;
     private String password;
     private String mobile;
@@ -29,11 +29,11 @@ public class User implements Serializable {
     private String updateTime;
     private List<Role> roles;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

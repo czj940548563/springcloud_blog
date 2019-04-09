@@ -15,6 +15,7 @@ public interface RoleDao {
     public Integer insertRole(Role role);
     public Integer updateRole(Role role);
     public Integer deleteRole(Long id);
-    Integer deleteUserRoleById(List<Long> ids);
-    public Integer deleteRoles(List<Long> ids);
+    Integer deleteUserRoleById(List<String> ids);
+    public Integer deleteRoles(List<String> ids);
+    List<Role> selectAllRole();
 }
