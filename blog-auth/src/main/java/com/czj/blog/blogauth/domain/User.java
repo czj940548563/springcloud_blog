@@ -25,7 +25,7 @@ public class User implements Serializable {
     private String createTime;
     private String loginTime;
     private String lastLoginTime;
-    private Integer loginCount;
+    private String loginCount;
     private String updateTime;
     private List<Role> roles;
 
@@ -93,11 +93,11 @@ public class User implements Serializable {
         this.lastLoginTime = lastLoginTime;
     }
 
-    public Integer getLoginCount() {
+    public String getLoginCount() {
         return loginCount;
     }
 
-    public void setLoginCount(Integer loginCount) {
+    public void setLoginCount(String loginCount) {
         this.loginCount = loginCount;
     }
 

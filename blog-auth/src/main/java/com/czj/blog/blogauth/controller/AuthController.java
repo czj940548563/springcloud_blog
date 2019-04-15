@@ -40,7 +40,7 @@ public class AuthController {
     public String regist(@RequestBody User user) {
         String id = SnowflakeIdWorker.generateId();
         user.setId(id);
-        user.setLoginCount(0);
+        user.setLoginCount("0");
         if (userService.insertUser(user) > 0) return id;
         else return "0";
     }

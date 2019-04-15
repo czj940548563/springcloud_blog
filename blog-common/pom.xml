@@ -27,6 +27,20 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.dyuproject.protostuff/protostuff-runtime -->
+		<dependency>
+			<groupId>com.dyuproject.protostuff</groupId>
+			<artifactId>protostuff-runtime</artifactId>
+			<version>1.1.3</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.dyuproject.protostuff/protostuff-json -->
+		<dependency>
+			<groupId>com.dyuproject.protostuff</groupId>
+			<artifactId>protostuff-core</artifactId>
+			<version>1.0.8</version>
+			<scope>compile</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>

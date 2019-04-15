@@ -36,7 +36,7 @@ spring:
     database: 0
     host: 127.0.0.1
     port: 6379
-# hystrix 信号量隔离，5秒后自动超时
+# hystrix 信号量隔离，15秒后自动超时
 hystrix:
  command:
    default:
@@ -44,7 +44,7 @@ hystrix:
        isolation:
          strategy: SEMAPHORE
          thread:
-           timeoutInMilliseconds: 5000
+           timeoutInMilliseconds: 15000
  shareSecurityContext: true
 
 

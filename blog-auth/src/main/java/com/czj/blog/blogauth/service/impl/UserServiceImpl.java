@@ -1,20 +1,22 @@
 package com.czj.blog.blogauth.service.impl;
 
 
-import com.czj.blog.blogauth.dao.RoleDao;
+import com.alibaba.fastjson.JSON;
 import com.czj.blog.blogauth.dao.UserDao;
+import com.czj.blog.blogauth.domain.Role;
 import com.czj.blog.blogauth.domain.User;
 import com.czj.blog.blogauth.service.UserService;
-import com.github.pagehelper.PageHelper;
+import com.czj.blog.blogauth.RedisUtils.RedisUtils;
+import com.czj.blog.blogauth.utils.DateUtil;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author: clownc
@@ -25,6 +27,10 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private RedisUtils redisUtils;
+
+    private String userStr = "user";
 
 
     @Override
@@ -32,49 +38,167 @@ public class UserServiceImpl implements UserService {
         return userDao.selectUser(user);
     }
 
-    @Override
-    public PageInfo selectAllUser(int pageNum,int pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
-        List<User> userList = userDao.selectAllUser();
-        if (CollectionUtils.isEmpty(userList)){
-            PageInfo<User> pageInfo = new PageInfo<>(Lists.newArrayList());
-            return pageInfo;
-        }else{
-            PageInfo<User> pageInfo = new PageInfo<>(userList);
-            return  pageInfo;
+
+    private List<User> getCacheBean(Set<String> strings) {
+        List<User> users = new ArrayList<>();
+        for (String s : strings) {
+            User user = JSON.parseObject(s, User.class);
+            users.add(user);
         }
 
+        return users;
+    }
+
+    @Override
+    public PageInfo selectAllUser(int pageNum, int pageSize) {
+        Long start = (pageNum - 1L) * pageSize;
+        Long end = pageNum * pageSize * 1L - 1L;
+        /**
+         * 先从缓存里面按分页查找，zset是顺序集合的缓存
+         */
+        Set<String> strings = redisUtils.zRange(userStr, start, end);
+        if (strings != null && strings.size() > 0) {
+            Long size = redisUtils.zSize(userStr);
+            List<User> users = getCacheBean(strings);
+            PageInfo<User> pageInfo = new PageInfo<>(users);
+            pageInfo.setPageNum(pageNum);
+            pageInfo.setPageSize(pageSize);
+            pageInfo.setTotal(size);
+            return pageInfo;
+        } else {
+            /**
+             * 缓存中不存在则从数据库中按分页查找，并存入缓存
+             * 为防止窜页，先查到所有数据放入缓存
+             */
+            List<User> userList = userDao.selectAllUser();
+            if (CollectionUtils.isEmpty(userList)) {
+                PageInfo<User> pageInfo = new PageInfo<>(Lists.newArrayList());
+                return pageInfo;
+            } else {
+                for (User user : userList) {
+                    double score = Double.parseDouble(user.getId());
+                    String userJson = JSON.toJSONString(user);
+                    redisUtils.zAdd(userStr, userJson, score);
+                    redisUtils.expire(userStr, 60 * 60, TimeUnit.SECONDS);
+                }
+                //从缓存里查
+                Long size = redisUtils.zSize(userStr);
+                Set<String> strings1 = redisUtils.zRange(userStr, start, end);
+                List<User> users = getCacheBean(strings1);
+                PageInfo<User> pageInfo = new PageInfo<>(users);
+                pageInfo.setPageNum(pageNum);
+                pageInfo.setPageSize(pageSize);
+                pageInfo.setTotal(size);
+                return pageInfo;
+            }
+        }
     }
 
     @Override
     public Integer insertUser(User user) {
-
-        return userDao.insertUser(user);
+        user.setCreateTime(DateUtil.getCurrentTime());
+        Integer integer = userDao.insertUser(user);
+        if (integer > 0) {
+            double score = Double.parseDouble(user.getId());
+            String userJson = JSON.toJSONString(user);
+            redisUtils.zAdd(userStr, userJson, score);
+        }
+        return integer;
     }
 
     @Override
     public Integer updateUser(User user) {
-        return userDao.updateUser(user);
+        user.setUpdateTime(DateUtil.getCurrentTime());
+        Integer integer = userDao.updateUser(user);
+        if (integer > 0) {
+            double score = Double.parseDouble(user.getId());
+            String userJson = JSON.toJSONString(user);
+            //更新数据，先删除缓存再新增
+            redisUtils.zRemoveRangeByScore(userStr, score, score);
+            redisUtils.zAdd(userStr, userJson, score);
+        }
+        return integer;
     }
 
+    /**
+     * 需要事务（待完善）
+     *
+     * @param ids
+     * @return
+     */
     @Override
-    public Integer deleteUsers( List<String> ids) {
+    public Integer deleteUsers(List<String> ids) {
         Integer integer = userDao.deleteUsers(ids);
         Integer integer1 = userDao.deleteUserRoleById(ids);
+        if (integer == ids.size()) {
+            for (String s : ids) {
+                double score = Double.parseDouble(s);
+                redisUtils.zRemoveRangeByScore(userStr, score, score);
+            }
+
+        }
         return integer;
     }
 
     @Override
     public User selectUserByAccount(String account) {
-        return userDao.selectUserByAccount(account);
+        Set<String> strings = redisUtils.zRange(userStr, 0, redisUtils.zSize(userStr) - 1);
+        /**
+         * 先从缓存里找
+         */
+        List<User> users = getCacheBean(strings);
+        if (users != null && users.size() > 0) {
+            for (User user : users) {
+                if (StringUtils.equals(account, user.getAccount()))
+                    return user;
+            }
+        }
+        /**
+         * 缓存没有则查数据库，若查到则放进缓存
+         */
+        User user = userDao.selectUserByAccount(account);
+        if (user != null) {
+            double score = Double.parseDouble(user.getId());
+            String userJson = JSON.toJSONString(user);
+            redisUtils.zAdd(userStr, userJson, score);
+        }
+        return user;
     }
 
+    /**
+     * 删除用户角色中间表中用户与角色的对应关系
+     * @param userId
+     * @param roleId
+     * @return
+     */
     @Override
-    public Integer deleteUserRoleByDoubleId(String userId,String roleId) {
+    public Integer deleteUserRoleByDoubleId(String userId, String roleId) {
         Map<String, Object> hashMap = new HashMap<>();
-        hashMap.put("userId",userId);
-        hashMap.put("roleId",roleId);
+        hashMap.put("userId", userId);
+        hashMap.put("roleId", roleId);
         Integer integer = userDao.deleteUserRoleByDoubleId(hashMap);
+        if (integer > 0) {
+            double score = Double.parseDouble(userId);
+            Set<String> strings = redisUtils.zRangeByScore(userStr, score, score);
+            if (strings != null && strings.size() > 0) {
+                List<User> users = getCacheBean(strings);
+                User user = users.get(0);
+                List<Role> roles = user.getRoles();
+                List<Role> roles1 = new ArrayList<>();
+                if (roles.size()>0){
+                    roles.forEach(role -> {
+                        if (!StringUtils.equals(roleId,role.getId()))
+                            roles1.add(role);
+                    });
+                    user.setRoles(roles1);
+                    String userJson = JSON.toJSONString(user);
+                    redisUtils.zRemoveRangeByScore(userStr,score,score);
+                    redisUtils.zAdd(userStr,userJson,score);
+                }
+            }
+
+        }
         return integer;
     }
+
 }
