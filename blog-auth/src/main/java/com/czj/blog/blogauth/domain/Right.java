@@ -22,6 +22,7 @@ public class Right implements Serializable {
     private String description;
     private String creatTime;
     private String updateTime;
+    private String enable;
 
     public String getId() {
         return id;
@@ -61,5 +62,13 @@ public class Right implements Serializable {
 
     public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getEnable() {
+        return enable;
+    }
+
+    public void setEnable(String enable) {
+        this.enable = enable;
     }
 }

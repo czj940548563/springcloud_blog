@@ -7,39 +7,53 @@
         <result column="id" property="id" />
         <result column="right_name" property="rightName" />
         <result column="description" property="description" />
+        <result column="createTime" property="create_time" />
+        <result column="updateTime" property="update_time" />
+        <result column="enable" property="enable" />
     </resultMap>
 
     <parameterMap id="Right" type="com.czj.blog.blogauth.domain.Right"/>
 
     <sql id="Base_Column_List">
-		id, right_name, description
+		id, right_name, description,enable,create_time
 	</sql>
 
-    <select id="selectRightById" resultMap="BaseResultMap" parameterType="java.lang.Long">
+    <select id="selectAllRight" resultMap="BaseResultMap" >
         select
         <include refid="Base_Column_List" />
         from t_right
-        where id = #{id}
+    </select>
+    <select id="selectRight" resultMap="BaseResultMap" parameterType="com.czj.blog.blogauth.domain.Right">
+        select
+        <include refid="Base_Column_List"/>
+        from t_right
+        <trim prefix="WHERE" prefixOverrides="AND | OR">
+            <if test="rightName != null">right_name=#{rightName} </if>
+            <if test="description != null">and description=#{description} </if>
+            <if test="enable != null">and enable=#{enable}</if>
+        </trim>
     </select>
 
     <update id="updateRight" parameterType="com.czj.blog.blogauth.domain.Right">
-        update t_user
+        update t_right
         <set>
-            <if test="right_name != null">role_name=#{rightName},</if>
+            <if test="rightName != null">right_name=#{rightName},</if>
             <if test="description != null">description=#{description},</if>
+            <if test="updateTime != null">update_time=#{updateTime},</if>
+            <if test="enable != null">enable=#{enable},</if>
         </set>
         where id=#{id}
     </update>
 
     <insert id="insertRight" parameterType="com.czj.blog.blogauth.domain.Right">
-        insert into t_right(id, right_name, description)
-        values(#{id}, #{rightName}, #{description})
+        insert into t_right(id,right_name,description,create_time)
+        values(#{id}, #{rightName}, #{description},#{creatTime})
     </insert>
     <delete id="deleteRole" parameterType="java.lang.Long">
         delete from t_right where id=#{id}
     </delete>
 
-    <delete id="deleteRoles"  parameterType = "java.util.List">
+    <delete id="deleteRights"  parameterType = "java.util.List">
         delete from t_right where 1>2
             or id in
         <foreach collection="ids"  item="item" open="(" separator="," close=")"  >

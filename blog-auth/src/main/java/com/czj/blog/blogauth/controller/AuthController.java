@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: clownc
@@ -36,6 +37,11 @@ public class AuthController {
         return userService.selectAllUser(pageNum,pageSize);
     }
 
+    @PostMapping("/selectOtherRoles")
+    public PageInfo selectOtherRoles(@RequestParam List<String> ids,@RequestParam int pageNum, @RequestParam int pageSize) {
+        return userService.selectOtherRoles(ids,pageNum,pageSize);
+    }
+
     @PostMapping(value = "/regist")
     public String regist(@RequestBody User user) {
         String id = SnowflakeIdWorker.generateId();
@@ -48,6 +54,12 @@ public class AuthController {
     @PostMapping(value = "/deleteUsers")
     public Integer deleteUsers(@RequestParam List<String> ids) {
         return userService.deleteUsers(ids);
+    }
+
+    @PostMapping(value = "/insertUserRole")
+    public Map<String,Object> insertUserRole(@RequestParam List<String> roleIds, @RequestParam String userId) {
+        String id = SnowflakeIdWorker.generateId();
+        return userService.insertUserRole(id,userId,roleIds);
     }
 
     @PostMapping(value = "/updateUser")

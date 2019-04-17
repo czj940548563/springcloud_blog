@@ -1,5 +1,6 @@
 package com.czj.blog.blogauth.dao;
 
+import com.czj.blog.blogauth.domain.Role;
 import com.czj.blog.blogauth.domain.User;
 
 import java.util.List;
@@ -26,4 +27,10 @@ public interface UserDao {
     Integer deleteUserRoleById(List<String> ids);
 
     Integer deleteUserRoleByDoubleId(Map<String, Object> params);
+
+    List<Role> selectOtherRoles(List<String> ids);
+
+    Integer insertUserRole(Map<String,String> params);
+
+    List<Role> selectRoles(String userId);
 }

@@ -41,7 +41,7 @@ public class DataInitApplicationRunner implements ApplicationRunner {
                 redisUtils.zRemoveRangeByScore(userStr,score,score);
                 String userJson = JSON.toJSONString(user);
                 redisUtils.zAdd(userStr,userJson,score);
-                redisUtils.expire(userStr,30*60*60, TimeUnit.SECONDS);
+                redisUtils.expire(userStr,24*60*60, TimeUnit.SECONDS);
             }
         } catch (Exception e){
             e.printStackTrace();

@@ -22,6 +22,7 @@ public class Role implements Serializable {
     private String description;
     private String createTime;
     private String updateTime;
+    private String enable;
     private List<Right> rights;
 
     public String getId() {
@@ -70,5 +71,13 @@ public class Role implements Serializable {
 
     public void setRights(List<Right> rights) {
         this.rights = rights;
+    }
+
+    public String getEnable() {
+        return enable;
+    }
+
+    public void setEnable(String enable) {
+        this.enable = enable;
     }
 }

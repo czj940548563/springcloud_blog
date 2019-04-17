@@ -11,7 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: clownc
@@ -32,6 +34,21 @@ public class AuthController {
     public Result<PageInfo> selectAllUser(@RequestParam(value = "pageNum") int pageNum,@RequestParam(value = "pageSize") int pageSize) {
         PageInfo pageInfo = schedualBlogAuth.selectAllUser(pageNum, pageSize);
         return Result.success(pageInfo);
+    }
+
+    @PostMapping("/selectOtherRoles")
+    public Result<PageInfo> selectOtherRoles(@RequestParam(value = "ids") List<String> ids,@RequestParam(value = "pageNum") int pageNum,@RequestParam(value = "pageSize") int pageSize) {
+        PageInfo pageInfo = schedualBlogAuth.selectOtherRoles(ids,pageNum, pageSize);
+        return Result.success(pageInfo);
+    }
+    @PostMapping("/insertUserRole")
+    public Result<List<Role>> insertUserRole(@RequestParam(value = "roleIds") List<String> roleIds,@RequestParam(value = "userId") String userId){
+        Map<String, Object> map = schedualBlogAuth.insertUserRole(roleIds, userId);
+        Integer integer =(Integer) map.get("integer");
+        List<Role> roles =(ArrayList<Role>) map.get("roles");
+        if (integer==roleIds.size()){
+            return Result.success(roles);
+        }else return Result.error(CodeMsg.SERVER_ERROR);
     }
 
     @PostMapping(value = "/regist")

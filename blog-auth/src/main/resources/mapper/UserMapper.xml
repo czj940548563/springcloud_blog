@@ -12,15 +12,26 @@
         <result column="last_login_time" property="lastLoginTime"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
-        <collection property="roles" ofType="Role" select="getRoles" javaType="ArrayList" column="id">
+        <collection property="roles" ofType="Role" select="selectRoles" javaType="ArrayList" column="id">
         </collection>
+    </resultMap>
 
+    <resultMap id="RoleMap" type="com.czj.blog.blogauth.domain.Role">
+        <result column="id" property="id" />
+        <result column="role_name" property="roleName" />
+        <result column="description" property="description" />
+        <result column="createTime" property="create_time" />
+        <result column="updateTime" property="update_time" />
+        <result column="enable" property="enable" />
     </resultMap>
 
     <parameterMap id="User" type="com.czj.blog.blogauth.domain.User"/>
 
     <sql id="Base_Column_List">
 		id, account, password, mobile,mail,login_time,last_login_time,login_count,create_time,update_time
+	</sql>
+    <sql id="Role_Column_List">
+		id,role_name,description
 	</sql>
 
     <select id="selectUser" resultMap="BaseResultMap" parameterType="com.czj.blog.blogauth.domain.User">
@@ -42,11 +53,12 @@
     </select>
 
 
-    <select id="getRoles" parameterType="java.lang.String" resultType="com.czj.blog.blogauth.domain.Role">
+    <select id="selectRoles" parameterType="java.lang.String" resultType="com.czj.blog.blogauth.domain.Role">
 		select r.id as id,
 			r.role_name as roleName,
 			r.description as description,
-			r.create_time as createTime
+			r.create_time as createTime,
+			r.enable as enable
 		from t_role r,t_user_role ur
 		where ur.user_id= #{id} and ur.role_id=r.id
 	</select>
@@ -73,6 +85,11 @@
 
     </insert>
 
+    <insert id="insertUserRole"  parameterType="java.util.Map">
+        insert into t_user_role(id,user_id,role_id)
+        values(#{id}, #{userId}, #{roleId})
+    </insert>
+
 
     <delete id="deleteUsers" parameterType="java.util.List">
         delete from t_user where id in
@@ -84,7 +101,21 @@
     <select id="selectUserByAccount" parameterType="java.lang.String" resultMap="BaseResultMap">
         select <include refid="Base_Column_List"/> from t_user where account=#{account}
     </select>
+    <select id="selectOtherRoles" parameterType="java.util.List" resultMap="RoleMap">
+        select
+        <include refid="Role_Column_List"/>
+        from t_role
+        <trim prefix="WHERE" prefixOverrides="AND | OR">
+            enable='1'
+            <if test="list != null">
+                and id not in
+                <foreach collection="list" item="id" open="(" separator="," close=")" index="index">
+                 #{id}
+                </foreach>
+            </if>
+        </trim>
 
+    </select>
     <delete id="deleteUserRoleById" parameterType="java.util.List">
         delete from t_user_role where user_id in
         <foreach collection="list" item="id" open="(" separator="," close=")" index="index">

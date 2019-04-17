@@ -11,11 +11,10 @@ import java.util.List;
  */
 
 public interface RoleDao {
-    public Role selectRoleByName(String name);
-    public Integer insertRole(Role role);
-    public Integer updateRole(Role role);
-    public Integer deleteRole(Long id);
+    Role selectRoleByName(String name);
+    Integer insertRole(Role role);
+    Integer updateRole(Role role);
     Integer deleteUserRoleById(List<String> ids);
-    public Integer deleteRoles(List<String> ids);
+    Integer deleteRoles(List<String> ids);
     List<Role> selectAllRole();
 }

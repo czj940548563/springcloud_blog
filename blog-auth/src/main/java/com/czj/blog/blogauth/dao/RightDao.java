@@ -1,10 +1,5 @@
 package com.czj.blog.blogauth.dao;
 
-
-
-
-
-
 import com.czj.blog.blogauth.domain.Right;
 
 import java.util.List;
@@ -15,9 +10,9 @@ import java.util.List;
  */
 
 public interface RightDao {
-    public Right selectRIghtById(String id);
-    public Integer insertRIght(Right right);
-    public Integer updateRIght(Right right);
-    public Integer deleteRIght(String id);
-    public Integer deleteRIghts(List<String> ids);
+    Right selectRight(Right right);
+    List<Right> selectAllRight();
+    Integer insertRight(Right right);
+    Integer updateRight(Right right);
+    Integer deleteRights(List<String> ids);
 }

@@ -2,12 +2,13 @@ package com.czj.blog.blogauth.service.impl;
 
 
 import com.alibaba.fastjson.JSON;
+import com.czj.blog.blogauth.RedisUtils.RedisUtils;
 import com.czj.blog.blogauth.dao.UserDao;
 import com.czj.blog.blogauth.domain.Role;
 import com.czj.blog.blogauth.domain.User;
 import com.czj.blog.blogauth.service.UserService;
-import com.czj.blog.blogauth.RedisUtils.RedisUtils;
 import com.czj.blog.blogauth.utils.DateUtil;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +46,6 @@ public class UserServiceImpl implements UserService {
             User user = JSON.parseObject(s, User.class);
             users.add(user);
         }
-
         return users;
     }
 
@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
                     double score = Double.parseDouble(user.getId());
                     String userJson = JSON.toJSONString(user);
                     redisUtils.zAdd(userStr, userJson, score);
-                    redisUtils.expire(userStr, 60 * 60, TimeUnit.SECONDS);
+                    redisUtils.expire(userStr, 30 * 60 * 60, TimeUnit.SECONDS);
                 }
                 //从缓存里查
                 Long size = redisUtils.zSize(userStr);
@@ -167,6 +167,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 删除用户角色中间表中用户与角色的对应关系
+     *
      * @param userId
      * @param roleId
      * @return
@@ -185,20 +186,68 @@ public class UserServiceImpl implements UserService {
                 User user = users.get(0);
                 List<Role> roles = user.getRoles();
                 List<Role> roles1 = new ArrayList<>();
-                if (roles.size()>0){
+                if (roles.size() > 0) {
                     roles.forEach(role -> {
-                        if (!StringUtils.equals(roleId,role.getId()))
+                        if (!StringUtils.equals(roleId, role.getId()))
                             roles1.add(role);
                     });
                     user.setRoles(roles1);
                     String userJson = JSON.toJSONString(user);
-                    redisUtils.zRemoveRangeByScore(userStr,score,score);
-                    redisUtils.zAdd(userStr,userJson,score);
+                    redisUtils.zRemoveRangeByScore(userStr, score, score);
+                    redisUtils.zAdd(userStr, userJson, score);
                 }
             }
 
         }
         return integer;
+    }
+
+    @Override
+    public PageInfo selectOtherRoles(List<String> ids,int pageNum,int pageSize) {
+        PageHelper.startPage(pageNum,pageSize);
+        List<Role> roles = userDao.selectOtherRoles(ids);
+        if (CollectionUtils.isEmpty(roles)) {
+            PageInfo<Role> pageInfo = new PageInfo<>(Lists.newArrayList());
+            return pageInfo;
+        } else {
+            PageInfo<Role> pageInfo = new PageInfo<>(roles);
+            return pageInfo;
+        }
+    }
+
+    /**
+     * 需要事务
+     * @param id
+     * @param userId
+     * @param roleIds
+     * @return
+     */
+    @Override
+    public Map<String,Object> insertUserRole(String id, String userId, List<String> roleIds) {
+        Map<String, String> map = new HashMap<>();
+        Map<String, Object> returnMap = new HashMap<>();
+        map.put("id",id);
+        map.put("userId",userId);
+        Integer sum=0;
+        for (String roleId:roleIds) {
+            map.put("roleId",roleId);
+            Integer integer = userDao.insertUserRole(map);
+            sum+=integer;
+        }
+        if (sum==roleIds.size()){
+            List<Role> roles = userDao.selectRoles(userId);
+            returnMap.put("roles",roles);
+            double score = Double.parseDouble(userId);
+            Set<String> strings = redisUtils.zRangeByScore(userStr, score, score);
+            List<User> users = getCacheBean(strings);
+            User user = users.get(0);
+            user.setRoles(roles);
+            String userJson = JSON.toJSONString(user);
+            redisUtils.zRemoveRangeByScore(userStr, score, score);
+            redisUtils.zAdd(userStr, userJson, score);
+        }
+        returnMap.put("integer",sum);
+        return returnMap;
     }
 
 }

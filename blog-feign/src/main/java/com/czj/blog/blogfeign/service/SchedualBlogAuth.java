@@ -7,6 +7,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: clownc
@@ -22,7 +23,8 @@ public interface SchedualBlogAuth {
 
     @RequestMapping(value = "/regist", method = RequestMethod.POST)
     String insertUser(@RequestBody User user);
-
+    @PostMapping("/insertUserRole")
+    Map<String,Object> insertUserRole(@RequestParam(value = "roleIds") List<String> roleIds, @RequestParam(value = "userId") String userId);
     @RequestMapping(value = "/deleteUser", method = RequestMethod.POST)
     Integer deleteUser(@RequestParam(value = "id") String id);
 
@@ -34,6 +36,9 @@ public interface SchedualBlogAuth {
 
     @PostMapping("selectUserByAccount")
     User selectUserByAccount(@RequestParam(value = "account") String account);
+
+    @PostMapping("selectOtherRoles")
+    PageInfo selectOtherRoles(@RequestParam(value = "ids") List<String> ids,@RequestParam(value = "pageNum") int pageNum,@RequestParam(value = "pageSize") int pageSize);
 
     @PostMapping("/selectRoleByName")
     Role selectRoleByName(@RequestParam(value = "name") String name);

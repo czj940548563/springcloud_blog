@@ -27,6 +27,7 @@ public class User implements Serializable {
     private String lastLoginTime;
     private String loginCount;
     private String updateTime;
+    private String enable;
     private List<Role> roles;
 
     public String getId() {
@@ -115,5 +116,13 @@ public class User implements Serializable {
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
+    }
+
+    public String getEnable() {
+        return enable;
+    }
+
+    public void setEnable(String enable) {
+        this.enable = enable;
     }
 }
