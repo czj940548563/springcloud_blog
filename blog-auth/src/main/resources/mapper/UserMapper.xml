@@ -12,6 +12,7 @@
         <result column="last_login_time" property="lastLoginTime"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
+        <result column="enable" property="enable"/>
         <collection property="roles" ofType="Role" select="selectRoles" javaType="ArrayList" column="id">
         </collection>
     </resultMap>
@@ -28,7 +29,7 @@
     <parameterMap id="User" type="com.czj.blog.blogauth.domain.User"/>
 
     <sql id="Base_Column_List">
-		id, account, password, mobile,mail,login_time,last_login_time,login_count,create_time,update_time
+		id, account, password, mobile,mail,login_time,last_login_time,login_count,create_time,update_time,enable
 	</sql>
     <sql id="Role_Column_List">
 		id,role_name,description
@@ -38,7 +39,6 @@
         select
         <include refid="Base_Column_List"/>
         from t_user
-
         <trim prefix="WHERE" prefixOverrides="AND | OR">
             <if test="account != null">account=#{account} </if>
             <if test="mobile != null">and mobile=#{mobile} </if>

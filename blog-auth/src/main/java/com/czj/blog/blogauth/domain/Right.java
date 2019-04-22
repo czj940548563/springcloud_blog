@@ -20,7 +20,7 @@ public class Right implements Serializable {
     private String id;
     private String rightName;
     private String description;
-    private String creatTime;
+    private String createTime;
     private String updateTime;
     private String enable;
 
@@ -48,12 +48,12 @@ public class Right implements Serializable {
         this.description = description;
     }
 
-    public String getCreatTime() {
-        return creatTime;
+    public String getCreateTime() {
+        return createTime;
     }
 
-    public void setCreatTime(String creatTime) {
-        this.creatTime = creatTime;
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 
     public String getUpdateTime() {

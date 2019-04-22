@@ -1,7 +1,9 @@
 package com.czj.blog.blogfeign.service;
 
+import com.czj.blog.blogauth.domain.Right;
 import com.czj.blog.blogauth.domain.Role;
 import com.czj.blog.blogauth.domain.User;
+import com.czj.blog.blogfeign.result.Result;
 import com.github.pagehelper.PageInfo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -15,16 +17,18 @@ import java.util.Map;
  */
 @FeignClient(value = "blog-auth")
 public interface SchedualBlogAuth {
-    @RequestMapping(value = "/hi", method = RequestMethod.GET)
-    String sayHiFromClientOne(@RequestParam(value = "name") String name);
-
     @RequestMapping(value = "/selectAllUser", method = RequestMethod.GET)
-    PageInfo selectAllUser(@RequestParam(value = "pageNum") int pageNum,@RequestParam(value = "pageSize") int pageSize);
+    PageInfo selectAllUser(@RequestParam(value = "pageNum") int pageNum, @RequestParam(value = "pageSize") int pageSize);
 
-    @RequestMapping(value = "/regist", method = RequestMethod.POST)
-    String insertUser(@RequestBody User user);
+    @RequestMapping(value = "/insertUser", method = RequestMethod.POST)
+    Integer insertUser(@RequestBody User user);
+
     @PostMapping("/insertUserRole")
-    Map<String,Object> insertUserRole(@RequestParam(value = "roleIds") List<String> roleIds, @RequestParam(value = "userId") String userId);
+    Map<String, Object> insertUserRole(@RequestParam(value = "roleIds") List<String> roleIds, @RequestParam(value = "userId") String userId);
+
+    @PostMapping("/insertRoleRight")
+    Map<String, Object> insertRoleRight(@RequestParam(value = "rightIds") List<String> rightIds, @RequestParam(value = "roleId") String roleId);
+
     @RequestMapping(value = "/deleteUser", method = RequestMethod.POST)
     Integer deleteUser(@RequestParam(value = "id") String id);
 
@@ -38,13 +42,13 @@ public interface SchedualBlogAuth {
     User selectUserByAccount(@RequestParam(value = "account") String account);
 
     @PostMapping("selectOtherRoles")
-    PageInfo selectOtherRoles(@RequestParam(value = "ids") List<String> ids,@RequestParam(value = "pageNum") int pageNum,@RequestParam(value = "pageSize") int pageSize);
+    PageInfo selectOtherRoles(@RequestParam(value = "ids") List<String> ids, @RequestParam(value = "pageNum") int pageNum, @RequestParam(value = "pageSize") int pageSize);
 
     @PostMapping("/selectRoleByName")
     Role selectRoleByName(@RequestParam(value = "name") String name);
 
     @PostMapping(value = "/insertRole")
-    String insertRole(@RequestBody Role role);
+    Integer insertRole(@RequestBody Role role);
 
     @PostMapping(value = "/updateRole")
     Integer updateRole(@RequestBody Role role);
@@ -56,7 +60,15 @@ public interface SchedualBlogAuth {
     Integer deleteRoles(@RequestParam(value = "ids") List<String> ids);
 
     @PostMapping(value = "/deleteRoleByUser")
-    Integer deleteRoleByUser(@RequestParam(value = "userId")String userId,@RequestParam(value = "roleId")String roleId);
+    Integer deleteRoleByUser(@RequestParam(value = "userId") String userId, @RequestParam(value = "roleId") String roleId);
+
     @RequestMapping(value = "/selectAllRole", method = RequestMethod.GET)
-    PageInfo selectAllRole(@RequestParam(value = "pageNum") int pageNum,@RequestParam(value = "pageSize") int pageSize);
+    PageInfo selectAllRole(@RequestParam(value = "pageNum") int pageNum, @RequestParam(value = "pageSize") int pageSize);
+
+    @PostMapping(value = "/deleteRightByRole")
+    Integer deleteRightByRole(@RequestParam(value = "roleId") String roleId, @RequestParam(value = "rightId") String rightId);
+
+    @PostMapping("selectOtherRights")
+    PageInfo selectOtherRights(@RequestParam(value = "ids") List<String> ids, @RequestParam(value = "pageNum") int pageNum, @RequestParam(value = "pageSize") int pageSize);
+
 }

@@ -27,28 +27,27 @@ public class AuthController {
     @Autowired
     private RoleService roleService;
 
-    @RequestMapping("/hi")
-    public String home(@RequestParam(value = "name", defaultValue = "forezp") String name) {
-        return "hi " + name + " ,i am from port:" + port;
-    }
 
     @RequestMapping(value = "/selectAllUser", method = RequestMethod.GET)
     public PageInfo selectAllUser(@RequestParam int pageNum, @RequestParam int pageSize) {
-        return userService.selectAllUser(pageNum,pageSize);
+        return userService.selectAllUser(pageNum, pageSize);
     }
 
     @PostMapping("/selectOtherRoles")
-    public PageInfo selectOtherRoles(@RequestParam List<String> ids,@RequestParam int pageNum, @RequestParam int pageSize) {
-        return userService.selectOtherRoles(ids,pageNum,pageSize);
+    public PageInfo selectOtherRoles(@RequestParam(required = false) List<String> ids, @RequestParam int pageNum, @RequestParam int pageSize) {
+        return userService.selectOtherRoles(ids, pageNum, pageSize);
     }
 
-    @PostMapping(value = "/regist")
-    public String regist(@RequestBody User user) {
-        String id = SnowflakeIdWorker.generateId();
-        user.setId(id);
-        user.setLoginCount("0");
-        if (userService.insertUser(user) > 0) return id;
-        else return "0";
+    @PostMapping("/selectOtherRights")
+    public PageInfo selectOtherRights(@RequestParam(required = false) List<String> ids, @RequestParam int pageNum, @RequestParam int pageSize) {
+        return roleService.selectOtherRights(ids, pageNum, pageSize);
+    }
+
+    @PostMapping(value = "/insertUser")
+    public Integer insertUser(@RequestBody User user) {
+
+        Integer integer = userService.insertUser(user);
+         return integer;
     }
 
     @PostMapping(value = "/deleteUsers")
@@ -57,9 +56,15 @@ public class AuthController {
     }
 
     @PostMapping(value = "/insertUserRole")
-    public Map<String,Object> insertUserRole(@RequestParam List<String> roleIds, @RequestParam String userId) {
-        String id = SnowflakeIdWorker.generateId();
-        return userService.insertUserRole(id,userId,roleIds);
+    public Map<String, Object> insertUserRole(@RequestParam List<String> roleIds, @RequestParam String userId) {
+
+        return userService.insertUserRole(userId, roleIds);
+    }
+
+    @PostMapping(value = "/insertRoleRight")
+    public Map<String, Object> insertRoleRight(@RequestParam List<String> rightIds, @RequestParam String roleId) {
+
+        return roleService.insertRoleRight(roleId, rightIds);
     }
 
     @PostMapping(value = "/updateUser")
@@ -71,31 +76,40 @@ public class AuthController {
     public User selectUserByAccount(@RequestParam String account) {
         return userService.selectUserByAccount(account);
     }
+
     @PostMapping("/selectRoleByName")
-    public Role selectRoleByName(@RequestParam String name){
+    public Role selectRoleByName(@RequestParam String name) {
         return roleService.selectRoleByName(name);
     }
+
     @PostMapping(value = "/insertRole")
-    public String insertRole(@RequestBody Role role){
-        String id = SnowflakeIdWorker.generateId();
-        role.setId(id);
-        if (roleService.insertRole(role) > 0) return id;
-        else return "0";
+    public Integer insertRole(@RequestBody Role role) {
+        Integer integer = roleService.insertRole(role);
+        return integer;
     }
+
     @PostMapping(value = "/updateRole")
-    public Integer updateRole(@RequestBody Role role){
+    public Integer updateRole(@RequestBody Role role) {
         return roleService.updateRole(role);
     }
+
     @PostMapping(value = "/deleteRoles")
-    public Integer deleteRoles(@RequestParam List<String> ids){
+    public Integer deleteRoles(@RequestParam List<String> ids) {
         return roleService.deleteRoles(ids);
     }
+
     @PostMapping(value = "/deleteRoleByUser")
-    public Integer deleteRoleByUser(@RequestParam String userId,@RequestParam String roleId){
-        return userService.deleteUserRoleByDoubleId(userId,roleId);
+    public Integer deleteRoleByUser(@RequestParam String userId, @RequestParam String roleId) {
+        return userService.deleteUserRoleByDoubleId(userId, roleId);
     }
+
     @RequestMapping(value = "/selectAllRole", method = RequestMethod.GET)
     public PageInfo selectAllRole(@RequestParam int pageNum, @RequestParam int pageSize) {
-        return roleService.selectAllRole(pageNum,pageSize);
+        return roleService.selectAllRole(pageNum, pageSize);
+    }
+
+    @PostMapping(value = "/deleteRightByRole")
+    public Integer deleteRightByRole(@RequestParam String roleId, @RequestParam String rightId) {
+        return roleService.deleteRoleRightByDoubleId(roleId, rightId);
     }
 }

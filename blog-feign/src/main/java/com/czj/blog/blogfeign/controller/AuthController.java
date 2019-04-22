@@ -1,5 +1,6 @@
 package com.czj.blog.blogfeign.controller;
 
+import com.czj.blog.blogauth.domain.Right;
 import com.czj.blog.blogauth.domain.Role;
 import com.czj.blog.blogauth.domain.User;
 import com.czj.blog.blogauth.utils.SnowflakeIdWorker;
@@ -25,11 +26,6 @@ public class AuthController {
     @Autowired
     SchedualBlogAuth schedualBlogAuth;
 
-    @RequestMapping(value = "/hi", method = RequestMethod.GET)
-    public String sayHi(@RequestParam String name) {
-        return schedualBlogAuth.sayHiFromClientOne(name);
-    }
-
     @RequestMapping(value = "/selectAllUser", method = RequestMethod.GET)
     public Result<PageInfo> selectAllUser(@RequestParam(value = "pageNum") int pageNum,@RequestParam(value = "pageSize") int pageSize) {
         PageInfo pageInfo = schedualBlogAuth.selectAllUser(pageNum, pageSize);
@@ -37,10 +33,16 @@ public class AuthController {
     }
 
     @PostMapping("/selectOtherRoles")
-    public Result<PageInfo> selectOtherRoles(@RequestParam(value = "ids") List<String> ids,@RequestParam(value = "pageNum") int pageNum,@RequestParam(value = "pageSize") int pageSize) {
+    public Result<PageInfo> selectOtherRoles(@RequestParam(value = "ids",required = false) List<String> ids,@RequestParam(value = "pageNum") int pageNum,@RequestParam(value = "pageSize") int pageSize) {
         PageInfo pageInfo = schedualBlogAuth.selectOtherRoles(ids,pageNum, pageSize);
         return Result.success(pageInfo);
     }
+    @PostMapping("/selectOtherRights")
+    public Result<PageInfo> selectOtherRights(@RequestParam(value = "ids",required = false) List<String> ids,@RequestParam(value = "pageNum") int pageNum,@RequestParam(value = "pageSize") int pageSize) {
+        PageInfo pageInfo = schedualBlogAuth.selectOtherRights(ids,pageNum, pageSize);
+        return Result.success(pageInfo);
+    }
+
     @PostMapping("/insertUserRole")
     public Result<List<Role>> insertUserRole(@RequestParam(value = "roleIds") List<String> roleIds,@RequestParam(value = "userId") String userId){
         Map<String, Object> map = schedualBlogAuth.insertUserRole(roleIds, userId);
@@ -50,19 +52,35 @@ public class AuthController {
             return Result.success(roles);
         }else return Result.error(CodeMsg.SERVER_ERROR);
     }
+    @PostMapping("/insertRoleRight")
+    public Result<List<Right>> insertRoleRight(@RequestParam(value = "rightIds") List<String> rightIds, @RequestParam(value = "roleId") String roleId){
+        Map<String, Object> map = schedualBlogAuth.insertRoleRight(rightIds, roleId);
+        Integer integer =(Integer) map.get("integer");
+        List<Right> rights =(ArrayList<Right>) map.get("rights");
+        if (integer==rightIds.size()){
+            return Result.success(rights);
+        }else return Result.error(CodeMsg.SERVER_ERROR);
+    }
 
-    @PostMapping(value = "/regist")
-    public Result<User> regist(@RequestBody User user) {
+    private Result<User> commonInsertUser(User user){
         String account = user.getAccount();
         User userExits = schedualBlogAuth.selectUserByAccount(account);
         if (userExits != null) return Result.error(CodeMsg.USER_EXITS);
         else {
-            String id = schedualBlogAuth.insertUser(user);
-            if (!StringUtils.equals(id,"0")) {
-                user.setId(id);
+           Integer integer = schedualBlogAuth.insertUser(user);
+            if (integer==1) {
                 return Result.success(user);
             } else return Result.error(CodeMsg.SERVER_ERROR);
         }
+    }
+
+    @PostMapping(value = "/regist")
+    public Result<User> regist(@RequestBody User user) {
+     return  commonInsertUser(user);
+    }
+    @PostMapping(value = "/insertUser")
+    public Result<User> insertUser(@RequestBody User user) {
+        return  commonInsertUser(user);
     }
 
     @RequestMapping(value = "/deleteUser", method = RequestMethod.POST)
@@ -105,9 +123,8 @@ public class AuthController {
         Role roleExits = schedualBlogAuth.selectRoleByName(name);
         if (roleExits != null) return Result.error(CodeMsg.ROLE_EXITS);
         else {
-            String id = schedualBlogAuth.insertRole(role);
-            if (StringUtils.equals(id,"0")) {
-                role.setId(id);
+            Integer integer = schedualBlogAuth.insertRole(role);
+            if (integer==1) {
                 return Result.success(role);
             } else return Result.error(CodeMsg.SERVER_ERROR);
         }
@@ -133,6 +150,12 @@ public class AuthController {
     @PostMapping(value = "/deleteRoleByUser")
     public Result<Object> deleteRoleByUser(@RequestParam(value = "userId",required=false)String userId ,@RequestParam(value = "roleId",required=false) String roleId){
         Integer integer = schedualBlogAuth.deleteRoleByUser(userId,roleId);
+        if (integer > 0 ) return Result.success(null);
+        else return Result.error(CodeMsg.SERVER_ERROR);
+    }
+    @PostMapping(value = "/deleteRightByRole")
+    public Result<Object> deleteRightByRole(@RequestParam(value = "roleId",required=false)String roleId ,@RequestParam(value = "rightId",required=false) String rightId){
+        Integer integer = schedualBlogAuth.deleteRightByRole(roleId,rightId);
         if (integer > 0 ) return Result.success(null);
         else return Result.error(CodeMsg.SERVER_ERROR);
     }

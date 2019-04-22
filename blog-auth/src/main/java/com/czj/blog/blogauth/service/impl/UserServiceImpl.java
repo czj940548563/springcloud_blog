@@ -8,6 +8,7 @@ import com.czj.blog.blogauth.domain.Role;
 import com.czj.blog.blogauth.domain.User;
 import com.czj.blog.blogauth.service.UserService;
 import com.czj.blog.blogauth.utils.DateUtil;
+import com.czj.blog.blogauth.utils.SnowflakeIdWorker;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
@@ -96,7 +97,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Integer insertUser(User user) {
+        String id = SnowflakeIdWorker.generateId();
+        user.setId(id);
+        user.setLoginCount("0");
         user.setCreateTime(DateUtil.getCurrentTime());
+        user.setEnable("1");
         Integer integer = userDao.insertUser(user);
         if (integer > 0) {
             double score = Double.parseDouble(user.getId());
@@ -223,13 +228,14 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
-    public Map<String,Object> insertUserRole(String id, String userId, List<String> roleIds) {
+    public Map<String,Object> insertUserRole( String userId, List<String> roleIds) {
         Map<String, String> map = new HashMap<>();
         Map<String, Object> returnMap = new HashMap<>();
-        map.put("id",id);
         map.put("userId",userId);
         Integer sum=0;
         for (String roleId:roleIds) {
+            String id = SnowflakeIdWorker.generateId();
+            map.put("id",id);
             map.put("roleId",roleId);
             Integer integer = userDao.insertUserRole(map);
             sum+=integer;

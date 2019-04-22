@@ -20,5 +20,5 @@ public interface UserService {
     User selectUserByAccount(String account);
     Integer deleteUserRoleByDoubleId(String userId,String roleId );
     PageInfo selectOtherRoles(List<String> ids,int pageNum, int pageSize);
-    Map<String,Object> insertUserRole(String id, String userId, List<String> roleIds);
+    Map<String,Object> insertUserRole( String userId, List<String> roleIds);
 }

@@ -1,41 +1,54 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.czj.blog.blogauth.dao.RoleDao">
-    <resultMap id="BaseResultMap" type="com.czj.blog.blogauth.domain.Role">
-        <result column="id" property="id" />
-        <result column="role_name" property="roleName" />
-        <result column="description" property="description" />
-        <result column="createTime" property="create_time" />
-        <result column="updateTime" property="update_time" />
-        <result column="enable" property="enable" />
-        <collection property="rights" ofType="Right" select="getRights" javaType="ArrayList" column="id">
+    <resultMap id="RoleResultMap" type="com.czj.blog.blogauth.domain.Role">
+        <result column="id" property="id"/>
+        <result column="role_name" property="roleName"/>
+        <result column="description" property="description"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="enable" property="enable"/>
+        <collection property="rights" ofType="Right" select="selectRights" javaType="ArrayList" column="id">
         </collection>
+    </resultMap>
+    <resultMap id="RightMap" type="com.czj.blog.blogauth.domain.Right">
+        <result column="id" property="id"/>
+        <result column="right_name" property="rightName"/>
+        <result column="description" property="description"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="enable" property="enable"/>
     </resultMap>
 
     <parameterMap id="Role" type="com.czj.blog.blogauth.domain.Role"/>
 
-    <sql id="Base_Column_List">
+    <sql id="Role_Column_List">
 		id, role_name, description,create_time,enable
 	</sql>
+    <sql id="Right_Column_List">
+		id,right_name,description
+	</sql>
 
-    <select id="selectAllRole" resultMap="BaseResultMap" >
+    <select id="selectAllRole" resultMap="RoleResultMap">
         select
-        <include refid="Base_Column_List" />
+        <include refid="Role_Column_List"/>
         from t_role
     </select>
 
-    <select id="selectRole" resultMap="BaseResultMap" parameterType="com.czj.blog.blogauth.domain.Role">
+    <select id="selectRole" resultMap="RoleResultMap" parameterType="com.czj.blog.blogauth.domain.Role">
         select
-        <include refid="Base_Column_List"/>
+        <include refid="Role_Column_List"/>
         from t_role
         <trim prefix="WHERE" prefixOverrides="AND | OR">
-            <if test="roleName != null">role_name=#{roleName} </if>
-            <if test="description != null">and description=#{description} </if>
+            <if test="roleName != null">role_name=#{roleName}</if>
+            <if test="description != null">and description=#{description}</if>
             <if test="enable != null">and enable=#{enable}</if>
         </trim>
     </select>
-
-    <select id="getRights" parameterType="java.lang.String" resultType="com.czj.blog.blogauth.domain.Right">
+    <select id="selectRoleByName" parameterType="java.lang.String" resultMap="RoleResultMap">
+        select <include refid="Role_Column_List"/> from t_role where role_name=#{roleName}
+    </select>
+    <select id="selectRights" parameterType="java.lang.String" resultType="com.czj.blog.blogauth.domain.Right">
 	select
 			r.id as id,
 			r.right_name as rightName,
@@ -43,31 +56,48 @@
 			r.create_time as createTime,
 			r.enable as enable
 			from t_right r,t_role_right rr
-		where rr.role_id= #{id} and rr.role_id=r.id
+		where rr.role_id= #{id} and rr.right_id=r.id
 	</select>
+    <select id="selectOtherRights" parameterType="java.util.List" resultMap="RightMap">
+        select
+        <include refid="Right_Column_List"/>
+        from t_right
+        <trim prefix="WHERE" prefixOverrides="AND | OR">
+            enable='1'
+            <if test="list != null">
+                and id not in
+                <foreach collection="list" item="id" open="(" separator="," close=")" index="index">
+                    #{id}
+                </foreach>
+            </if>
+        </trim>
 
+    </select>
 
     <update id="updateRole" parameterType="com.czj.blog.blogauth.domain.Role">
         update t_role
         <set>
             <if test="roleName != null">role_name=#{roleName},</if>
             <if test="description != null">description=#{description},</if>
-            <if test="update_time != null">update_time=#{updateTime},</if>
+            <if test="updateTime != null">update_time=#{updateTime},</if>
             <if test="enable != null">enable=#{enable},</if>
         </set>
         where id=#{id}
     </update>
 
     <insert id="insertRole" parameterType="com.czj.blog.blogauth.domain.Role">
-        insert into t_role(id, role_name, description,createTime)
-        values(#{id}, #{roleName}, #{description},#{create_time})
+        insert into t_role(id, role_name, description,create_time)
+        values(#{id}, #{roleName}, #{description},#{createTime})
+    </insert>
+    <insert id="insertRoleRight" parameterType="java.util.Map">
+        insert into t_role_right(id,role_id,right_id)
+        values(#{id}, #{roleId}, #{rightId})
     </insert>
 
-    <delete id="deleteRoles"  parameterType = "java.util.List">
-        delete from t_role where 1>2
-            or id in
-        <foreach collection="list"  item="item" open="(" separator="," close=")"  >
-            #{item}
+    <delete id="deleteRoles" parameterType="java.util.List">
+        delete from t_role where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
         </foreach>
     </delete>
     <delete id="deleteUserRoleById" parameterType="java.util.List">
@@ -76,5 +106,13 @@
             #{id}
         </foreach>
     </delete>
-
+    <delete id="deleteRoleRightById" parameterType="java.util.List">
+        delete from t_role_right where role_id in
+        <foreach collection="list" item="id" open="(" separator="," close=")" index="index">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteRightRoleByDoubleId" parameterType="java.util.Map">
+        delete from t_role_right where right_id=#{rightId} and role_id=#{roleId}
+    </delete>
 </mapper>

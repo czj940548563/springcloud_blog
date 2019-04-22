@@ -7,8 +7,8 @@
         <result column="id" property="id" />
         <result column="right_name" property="rightName" />
         <result column="description" property="description" />
-        <result column="createTime" property="create_time" />
-        <result column="updateTime" property="update_time" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
         <result column="enable" property="enable" />
     </resultMap>
 
