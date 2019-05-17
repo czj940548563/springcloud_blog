@@ -1,7 +1,9 @@
 package com.czj.blog.blogauth.controller;
 
+import com.czj.blog.blogauth.domain.Right;
 import com.czj.blog.blogauth.domain.Role;
 import com.czj.blog.blogauth.domain.User;
+import com.czj.blog.blogauth.service.RightService;
 import com.czj.blog.blogauth.service.RoleService;
 import com.czj.blog.blogauth.service.UserService;
 import com.czj.blog.blogauth.utils.SnowflakeIdWorker;
@@ -26,6 +28,8 @@ public class AuthController {
     private UserService userService;
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private RightService rightService;
 
 
     @RequestMapping(value = "/selectAllUser", method = RequestMethod.GET)
@@ -108,8 +112,43 @@ public class AuthController {
         return roleService.selectAllRole(pageNum, pageSize);
     }
 
+    @PostMapping("selectUserIdByRoleId")
+    public List<String> selectUserIdByRoleId(@RequestParam List<String> ids){
+        List<String> list = roleService.selectUserIdByRoleId(ids);
+        return list;
+    }
     @PostMapping(value = "/deleteRightByRole")
     public Integer deleteRightByRole(@RequestParam String roleId, @RequestParam String rightId) {
         return roleService.deleteRoleRightByDoubleId(roleId, rightId);
+    }
+
+    @RequestMapping(value = "/selectAllRight", method = RequestMethod.GET)
+    public PageInfo selectAllRight(@RequestParam int pageNum, @RequestParam int pageSize) {
+        return rightService.selectAllRight(pageNum, pageSize);
+    }
+
+    @PostMapping(value = "/selectRoleIdByRightId")
+    public List<String> selectRoleIdByRightId(@RequestParam List<String> ids){
+        List<String> list = rightService.selectRoleIdByRightId(ids);
+        return list;
+    }
+    @PostMapping(value = "/deleteRights")
+    public Integer deleteRights(@RequestParam List<String> ids){
+        return rightService.deleteRights(ids);
+    }
+    @PostMapping("/selectRightByName")
+    public Right selectRightByName(@RequestParam(value = "name") String name){
+        return rightService.selectRightByName(name);
+    }
+
+    @PostMapping(value = "/insertRight")
+    public Integer insertRole(@RequestBody Right right) {
+        Integer integer = rightService.insertRight(right);
+        return integer;
+    }
+
+    @PostMapping(value = "/updateRight")
+    public Integer updateRole(@RequestBody Right right) {
+        return rightService.updateRight(right);
     }
 }

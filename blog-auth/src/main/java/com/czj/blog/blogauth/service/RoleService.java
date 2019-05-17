@@ -26,4 +26,7 @@ public interface RoleService {
     PageInfo selectOtherRights(List<String> ids, int pageNum, int pageSize);
 
     Map<String,Object> insertRoleRight(String roleId, List<String> rightIds);
+
+    List<String> selectUserIdByRoleId(List<String> ids);
+
 }

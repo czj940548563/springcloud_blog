@@ -3,7 +3,6 @@ package com.czj.blog.blogfeign.service;
 import com.czj.blog.blogauth.domain.Right;
 import com.czj.blog.blogauth.domain.Role;
 import com.czj.blog.blogauth.domain.User;
-import com.czj.blog.blogfeign.result.Result;
 import com.github.pagehelper.PageInfo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -59,6 +58,8 @@ public interface SchedualBlogAuth {
     @PostMapping(value = "/deleteRoles")
     Integer deleteRoles(@RequestParam(value = "ids") List<String> ids);
 
+
+
     @PostMapping(value = "/deleteRoleByUser")
     Integer deleteRoleByUser(@RequestParam(value = "userId") String userId, @RequestParam(value = "roleId") String roleId);
 
@@ -71,4 +72,27 @@ public interface SchedualBlogAuth {
     @PostMapping("selectOtherRights")
     PageInfo selectOtherRights(@RequestParam(value = "ids") List<String> ids, @RequestParam(value = "pageNum") int pageNum, @RequestParam(value = "pageSize") int pageSize);
 
+    @RequestMapping(value = "/selectAllRight", method = RequestMethod.GET)
+    PageInfo selectAllRight(@RequestParam(value = "pageNum") int pageNum, @RequestParam(value = "pageSize") int pageSize);
+
+    @PostMapping(value = "/selectUserIdByRoleId")
+    List<String> selectUserIdByRoleId(@RequestParam(value = "ids") List<String> ids);
+
+    @PostMapping(value = "/selectRoleIdByRightId")
+    List<String> selectRoleIdByRightId(@RequestParam(value = "ids") List<String> ids);
+
+    @PostMapping("/selectRightByName")
+    Right selectRightByName(@RequestParam(value = "name") String name);
+
+    @PostMapping(value = "/insertRight")
+    Integer insertRight(@RequestBody Right right);
+
+    @PostMapping(value = "/deleteRights")
+    Integer deleteRights(@RequestParam(value = "ids") List<String> ids);
+
+    @PostMapping(value = "/updateRight")
+    Integer updateRight(@RequestBody Right right);
+
+    @PostMapping("/login")
+    User login(@RequestParam(value = "account") String account,@RequestParam(value = "password") String password);
 }

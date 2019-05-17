@@ -6,6 +6,7 @@
     <resultMap id="BaseResultMap" type="com.czj.blog.blogauth.domain.Right">
         <result column="id" property="id" />
         <result column="right_name" property="rightName" />
+        <result column="right_code" property="rightCode" />
         <result column="description" property="description" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
@@ -15,7 +16,7 @@
     <parameterMap id="Right" type="com.czj.blog.blogauth.domain.Right"/>
 
     <sql id="Base_Column_List">
-		id, right_name, description,enable,create_time
+		id, right_name,right_code, description,enable,create_time
 	</sql>
 
     <select id="selectAllRight" resultMap="BaseResultMap" >
@@ -33,11 +34,23 @@
             <if test="enable != null">and enable=#{enable}</if>
         </trim>
     </select>
+    <select id="selectRightByName" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_right where right_name=#{rightName}
+    </select>
+    <select id="selectRoleIdByRightId" parameterType="java.util.List" resultType="java.lang.String">
+        select distinct role_id from t_role_right where right_id  in
+        <foreach collection="list" item="id" open="(" separator="," close=")" index="index">
+            #{id}
+        </foreach>
+    </select>
 
     <update id="updateRight" parameterType="com.czj.blog.blogauth.domain.Right">
         update t_right
         <set>
             <if test="rightName != null">right_name=#{rightName},</if>
+            <if test="rightCode != null">right_code=#{rightCode},</if>
             <if test="description != null">description=#{description},</if>
             <if test="updateTime != null">update_time=#{updateTime},</if>
             <if test="enable != null">enable=#{enable},</if>
@@ -46,18 +59,17 @@
     </update>
 
     <insert id="insertRight" parameterType="com.czj.blog.blogauth.domain.Right">
-        insert into t_right(id,right_name,description,create_time)
-        values(#{id}, #{rightName}, #{description},#{creatTime})
+        insert into t_right(id,right_name,right_code,description,create_time,enable)
+        values(#{id}, #{rightName},#{rightCode}, #{description},#{createTime},#{enable})
     </insert>
     <delete id="deleteRole" parameterType="java.lang.Long">
         delete from t_right where id=#{id}
     </delete>
 
-    <delete id="deleteRights"  parameterType = "java.util.List">
-        delete from t_right where 1>2
-            or id in
-        <foreach collection="ids"  item="item" open="(" separator="," close=")"  >
-                 #{item}
+    <delete id="deleteRights"  parameterType="java.util.List">
+        delete from t_right where id in
+        <foreach collection="list"  item="id" open="(" separator="," close=")"  >
+            #{id}
         </foreach>
     </delete>
 

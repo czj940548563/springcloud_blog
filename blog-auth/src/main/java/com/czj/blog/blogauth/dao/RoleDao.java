@@ -3,6 +3,7 @@ package com.czj.blog.blogauth.dao;
 
 import com.czj.blog.blogauth.domain.Right;
 import com.czj.blog.blogauth.domain.Role;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 import java.util.Map;
@@ -27,4 +28,9 @@ public interface RoleDao {
     Integer insertRoleRight(Map<String,String> map);
 
     List<Right> selectRights(String roleId);
+
+    Integer deleteUserRoleByRoleId(List<String> ids);
+
+    List<String> selectUserIdByRoleId(List<String> ids);
+
 }

@@ -1,0 +1,25 @@
+package com.czj.blog.blogcommon.utils;
+
+
+import com.alibaba.fastjson.JSONObject;
+import jdk.nashorn.internal.runtime.JSONFunctions;
+
+/**
+ * @Author: clownc
+ * @Date: 2019-04-26 15:31
+ */
+public class JsonConvertUtil {
+    /**
+     * JSON 转 Object
+     */
+    public static <T> T jsonToObject(String pojo, Class<T> clazz) {
+        return JSONObject.parseObject(pojo, clazz);
+    }
+
+    /**
+     * Object 转 JSON
+     */
+    public static <T> String objectToJson(T t){
+        return JSONObject.toJSONString(t);
+    }
+}

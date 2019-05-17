@@ -3,7 +3,10 @@ package com.czj.blog.blogauth.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.czj.blog.blogauth.RedisUtils.RedisUtils;
+import com.czj.blog.blogauth.dao.RightDao;
+import com.czj.blog.blogauth.dao.RoleDao;
 import com.czj.blog.blogauth.dao.UserDao;
+import com.czj.blog.blogauth.domain.Right;
 import com.czj.blog.blogauth.domain.Role;
 import com.czj.blog.blogauth.domain.User;
 import com.czj.blog.blogauth.service.UserService;
@@ -15,6 +18,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -30,6 +34,10 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserDao userDao;
     @Autowired
+    private RoleDao roleDao;
+    @Autowired
+    private RightDao rightDao;
+    @Autowired
     private RedisUtils redisUtils;
 
     private String userStr = "user";
@@ -41,7 +49,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private List<User> getCacheBean(Set<String> strings) {
+    public static List<User> getCacheBean(Set<String> strings) {
         List<User> users = new ArrayList<>();
         for (String s : strings) {
             User user = JSON.parseObject(s, User.class);
@@ -60,7 +68,7 @@ public class UserServiceImpl implements UserService {
         Set<String> strings = redisUtils.zRange(userStr, start, end);
         if (strings != null && strings.size() > 0) {
             Long size = redisUtils.zSize(userStr);
-            List<User> users = getCacheBean(strings);
+            List<User> users = UserServiceImpl.getCacheBean(strings);
             PageInfo<User> pageInfo = new PageInfo<>(users);
             pageInfo.setPageNum(pageNum);
             pageInfo.setPageSize(pageSize);
@@ -85,7 +93,7 @@ public class UserServiceImpl implements UserService {
                 //从缓存里查
                 Long size = redisUtils.zSize(userStr);
                 Set<String> strings1 = redisUtils.zRange(userStr, start, end);
-                List<User> users = getCacheBean(strings1);
+                List<User> users = UserServiceImpl.getCacheBean(strings1);
                 PageInfo<User> pageInfo = new PageInfo<>(users);
                 pageInfo.setPageNum(pageNum);
                 pageInfo.setPageSize(pageSize);
@@ -96,13 +104,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional//开启本地事务
     public Integer insertUser(User user) {
+        List<Role> roleList = new ArrayList<>();
+        List<String> roleIds = new ArrayList<>();
         String id = SnowflakeIdWorker.generateId();
         user.setId(id);
         user.setLoginCount("0");
         user.setCreateTime(DateUtil.getCurrentTime());
         user.setEnable("1");
+        String roleName = "普通用户";
+        Role role = roleDao.selectRoleByName(roleName);
+        List<Right> rights = roleDao.selectRights(role.getId());
+        if (rights != null && rights.size() > 0) {
+            role.setRights(rights);
+        }
+        roleList.add(role);
+        user.setRoles(roleList);
         Integer integer = userDao.insertUser(user);
+        //
+        roleIds.add(role.getId());
+        insertUserRole(user.getId(), roleIds);
         if (integer > 0) {
             double score = Double.parseDouble(user.getId());
             String userJson = JSON.toJSONString(user);
@@ -132,10 +154,11 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
+    @Transactional
     public Integer deleteUsers(List<String> ids) {
         Integer integer = userDao.deleteUsers(ids);
         Integer integer1 = userDao.deleteUserRoleById(ids);
-        if (integer == ids.size()) {
+        if (integer == ids.size()&&integer1==ids.size()) {
             for (String s : ids) {
                 double score = Double.parseDouble(s);
                 redisUtils.zRemoveRangeByScore(userStr, score, score);
@@ -151,7 +174,7 @@ public class UserServiceImpl implements UserService {
         /**
          * 先从缓存里找
          */
-        List<User> users = getCacheBean(strings);
+        List<User> users = UserServiceImpl.getCacheBean(strings);
         if (users != null && users.size() > 0) {
             for (User user : users) {
                 if (StringUtils.equals(account, user.getAccount()))
@@ -187,7 +210,7 @@ public class UserServiceImpl implements UserService {
             double score = Double.parseDouble(userId);
             Set<String> strings = redisUtils.zRangeByScore(userStr, score, score);
             if (strings != null && strings.size() > 0) {
-                List<User> users = getCacheBean(strings);
+                List<User> users = UserServiceImpl.getCacheBean(strings);
                 User user = users.get(0);
                 List<Role> roles = user.getRoles();
                 List<Role> roles1 = new ArrayList<>();
@@ -208,8 +231,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageInfo selectOtherRoles(List<String> ids,int pageNum,int pageSize) {
-        PageHelper.startPage(pageNum,pageSize);
+    public PageInfo selectOtherRoles(List<String> ids, int pageNum, int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
         List<Role> roles = userDao.selectOtherRoles(ids);
         if (CollectionUtils.isEmpty(roles)) {
             PageInfo<Role> pageInfo = new PageInfo<>(Lists.newArrayList());
@@ -222,37 +245,38 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 需要事务
-     * @param id
+     *
      * @param userId
      * @param roleIds
      * @return
      */
     @Override
-    public Map<String,Object> insertUserRole( String userId, List<String> roleIds) {
+    @Transactional
+    public Map<String, Object> insertUserRole(String userId, List<String> roleIds) {
         Map<String, String> map = new HashMap<>();
         Map<String, Object> returnMap = new HashMap<>();
-        map.put("userId",userId);
-        Integer sum=0;
-        for (String roleId:roleIds) {
+        map.put("userId", userId);
+        Integer sum = 0;
+        for (String roleId : roleIds) {
             String id = SnowflakeIdWorker.generateId();
-            map.put("id",id);
-            map.put("roleId",roleId);
+            map.put("id", id);
+            map.put("roleId", roleId);
             Integer integer = userDao.insertUserRole(map);
-            sum+=integer;
+            sum += integer;
         }
-        if (sum==roleIds.size()){
+        if (sum == roleIds.size()) {
             List<Role> roles = userDao.selectRoles(userId);
-            returnMap.put("roles",roles);
+            returnMap.put("roles", roles);
             double score = Double.parseDouble(userId);
             Set<String> strings = redisUtils.zRangeByScore(userStr, score, score);
-            List<User> users = getCacheBean(strings);
+            List<User> users = UserServiceImpl.getCacheBean(strings);
             User user = users.get(0);
             user.setRoles(roles);
             String userJson = JSON.toJSONString(user);
             redisUtils.zRemoveRangeByScore(userStr, score, score);
             redisUtils.zAdd(userStr, userJson, score);
         }
-        returnMap.put("integer",sum);
+        returnMap.put("integer", sum);
         return returnMap;
     }
 

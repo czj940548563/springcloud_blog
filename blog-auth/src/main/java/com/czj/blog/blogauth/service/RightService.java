@@ -10,9 +10,18 @@ import java.util.List;
  * @Date: 2019-04-17 9:36
  */
 public interface RightService {
-    public Right selectRight(Right right);
-    public PageInfo selectAllRight(int pageNum, int pageSize);
-    public Integer insertRight(Right right);
-    public Integer updateRight(Right right);
-    public Integer deleteRights(List<String> ids);
+    Right selectRight(Right right);
+
+    PageInfo selectAllRight(int pageNum, int pageSize);
+
+    Integer insertRight(Right right);
+
+    Integer updateRight(Right right);
+
+    Integer deleteRights(List<String> ids);
+
+    List<String> selectRoleIdByRightId(List<String> ids);
+
+    Right selectRightByName(String name);
+
 }

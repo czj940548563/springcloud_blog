@@ -14,6 +14,7 @@
     <resultMap id="RightMap" type="com.czj.blog.blogauth.domain.Right">
         <result column="id" property="id"/>
         <result column="right_name" property="rightName"/>
+        <result column="right_code" property="rightCode"/>
         <result column="description" property="description"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
@@ -46,14 +47,17 @@
         </trim>
     </select>
     <select id="selectRoleByName" parameterType="java.lang.String" resultMap="RoleResultMap">
-        select <include refid="Role_Column_List"/> from t_role where role_name=#{roleName}
+        select
+        <include refid="Role_Column_List"/>
+        from t_role where role_name=#{roleName}
     </select>
-    <select id="selectRights" parameterType="java.lang.String" resultType="com.czj.blog.blogauth.domain.Right">
+    <select id="selectRights" parameterType="java.lang.String" resultMap="RightMap">
 	select
 			r.id as id,
-			r.right_name as rightName,
-			r.description as description,
-			r.create_time as createTime,
+			r.right_name ,
+			r.right_code ,
+			r.description ,
+			r.create_time ,
 			r.enable as enable
 			from t_right r,t_role_right rr
 		where rr.role_id= #{id} and rr.right_id=r.id
@@ -73,6 +77,12 @@
         </trim>
 
     </select>
+    <select id="selectUserIdByRoleId" parameterType="java.util.List" resultType="java.lang.String">
+        select distinct user_id from t_user_role where role_id in
+        <foreach collection="list" item="id" open="(" separator="," close=")" index="index">
+            #{id}
+        </foreach>
+    </select>
 
     <update id="updateRole" parameterType="com.czj.blog.blogauth.domain.Role">
         update t_role
@@ -86,8 +96,8 @@
     </update>
 
     <insert id="insertRole" parameterType="com.czj.blog.blogauth.domain.Role">
-        insert into t_role(id, role_name, description,create_time)
-        values(#{id}, #{roleName}, #{description},#{createTime})
+        insert into t_role(id, role_name, description,create_time,enable)
+        values(#{id}, #{roleName}, #{description},#{createTime},#{enable})
     </insert>
     <insert id="insertRoleRight" parameterType="java.util.Map">
         insert into t_role_right(id,role_id,right_id)
@@ -108,6 +118,12 @@
     </delete>
     <delete id="deleteRoleRightById" parameterType="java.util.List">
         delete from t_role_right where role_id in
+        <foreach collection="list" item="id" open="(" separator="," close=")" index="index">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteUserRoleByRoleId" parameterType="java.util.List">
+        delete from t_user_role where role_id in
         <foreach collection="list" item="id" open="(" separator="," close=")" index="index">
             #{id}
         </foreach>

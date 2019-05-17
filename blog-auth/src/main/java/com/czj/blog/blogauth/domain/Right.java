@@ -19,6 +19,7 @@ public class Right implements Serializable {
     private static final long serialVersionUID = -4601859381069240541L;
     private String id;
     private String rightName;
+    private String rightCode;
     private String description;
     private String createTime;
     private String updateTime;
@@ -38,6 +39,14 @@ public class Right implements Serializable {
 
     public void setRightName(String rightName) {
         this.rightName = rightName;
+    }
+
+    public String getRightCode() {
+        return rightCode;
+    }
+
+    public void setRightCode(String rightCode) {
+        this.rightCode = rightCode;
     }
 
     public String getDescription() {

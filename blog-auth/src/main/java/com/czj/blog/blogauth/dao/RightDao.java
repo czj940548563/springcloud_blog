@@ -15,4 +15,9 @@ public interface RightDao {
     Integer insertRight(Right right);
     Integer updateRight(Right right);
     Integer deleteRights(List<String> ids);
+
+    List<String> selectRoleIdByRightId(List<String> ids);
+
+    Right selectRightByName(String name);
+
 }
